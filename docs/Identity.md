@@ -11,7 +11,6 @@ the same as an ordinary `Reader`.
 The `Identity` type consists of a single constructor.
 
 ```js
-const Identity = require('ramda-fantasy').Identity;
 const five = Identity(5);
 ```
 

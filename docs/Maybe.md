@@ -13,7 +13,7 @@ The `Maybe` type consists of two constructors, `Just :: a -> Maybe a` and
 `a` respectively.
 
 ```js
-const M       = require('ramda-fantasy').Maybe;
+const M       = Maybe;
 const Just    = M.Just;
 const Nothing = M.Nothing;
 
