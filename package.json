@@ -1,0 +1,10 @@
+{
+  "name": "algebraic",
+  "description": "Fantasy Land compatible types for easy integration with Ramda",
+  "version": "1.0",
+  "dependencies": {
+    "ramda": ">=0.15.0",
+     "fluture": "^5.0.0",
+    "futurize": "^1.2.0"
+  }
+}
