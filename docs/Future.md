@@ -16,10 +16,6 @@ Some of the features provided by luture include:
 * [Cancellation](#future).
 * [Resource management utilities](#resource-management).
 
-For more information:
-
-* [Wiki: Compare Futures to Promises][wiki:promises]
-
 ```js
 const fs = require('fs');
 const Future = require("brisksale-algebraic-types").Future;
