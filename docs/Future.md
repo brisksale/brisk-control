@@ -4,45 +4,25 @@ The `Future` type is used to represent some future, often asynchronous,
 action that may potentially fail. It is similar to the native JS `Promise` type,
 however the computation of a `Promise` is executed immediately, while the
 execution of a `Future` instance is delayed until explicitly requested.
-This uses The Fluture library to implemeant the future https://github.com/fluture-js/Fluture 
-This also includes futurize for convienience https://github.com/futurize/futurize
 
 
-# [![Fluture](logo.png)](#butterfly)
-
-[![Chat](https://badges.gitter.im/fluture-js/Fluture.svg)](https://gitter.im/fluture-js/Fluture)
-[![NPM Version](https://badge.fury.io/js/fluture.svg)](https://www.npmjs.com/package/fluture)
-[![Dependencies](https://david-dm.org/fluture-js/Fluture.svg)](https://david-dm.org/fluture-js/Fluture)
-[![Build Status](https://travis-ci.org/fluture-js/Fluture.svg?branch=master)](https://travis-ci.org/fluture-js/Fluture)
-[![Code Coverage](https://codecov.io/gh/fluture-js/Fluture/branch/master/graph/badge.svg)](https://codecov.io/gh/fluture-js/Fluture)
-
-Fluture offers a control structure similar to Promises, Tasks, Deferreds, and
-what-have-you. Let's call them Futures.
 
 Much like Promises, Futures represent the value arising from the success or
 failure of an asynchronous operation (I/O). Though unlike Promises, Futures are
 *lazy* and adhere to [the *monadic* interface](#interoperability).
 
-Some of the features provided by Fluture include:
+Some of the features provided by luture include:
 
 * [Cancellation](#future).
 * [Resource management utilities](#resource-management).
-* Great integration with functional libraries such as [Sanctuary][S].
-* A pleasant debugging experience through informative error messages.
 
 For more information:
 
 * [Wiki: Compare Futures to Promises][wiki:promises]
-* [Wiki: Compare Fluture to similar libraries][wiki:similar]
-* [Video: Monad a Day by @DrBoolean - Futures][5]
-
-## Usage
-
-> `npm install --save fluture`
 
 ```js
 const fs = require('fs');
-const Future = require('fluture');
+const Future = require("brisksale-algebraic-types").Future;
 
 const getPackageName = file =>
   Future.node(done => fs.readFile(file, 'utf8', done))
@@ -51,10 +31,10 @@ const getPackageName = file =>
 
 getPackageName('package.json')
 .fork(console.error, console.log);
-//> "fluture"
+
 ```
 
-For front-end applications and node <v4, please use `require('fluture/es5')`.
+
 
 ## Table of contents
 
@@ -130,7 +110,7 @@ with a `#` refer to functions on the prototype.
 
 A list of all types used within the signatures follows:
 
-- **Future** - Instances of Future provided by Fluture.
+- **Future** - Instances of Future 
 - **Promise** - Values which conform to the [Promises/A+ specification][7].
 - **Functor** - Values which conform to the [Fantasy Land Functor specification][FL:functor]
   as determined by [Sanctuary Type Classes][Z:Functor].
@@ -788,7 +768,7 @@ to [`parallel`](#parallel) and [`race`](#race).
 
 ```js
 const {of, ap, zero, alt, sequence} = require('sanctuary');
-const {Future, Par, seq} = require('fluture');
+const {Future, Par, seq} = require("brisksale-algebraic-types").Future;
 
 //Some dummy values
 const x = 1;
@@ -820,8 +800,8 @@ created within other contexts. It is therefore recommended to use this over
 using the exact `Future` constructor you're testing against.
 
 ```js
-const Future1 = require('/path/to/fluture');
-const Future2 = require('/other/path/to/fluture');
+const Future1 = require('/path/to/future');
+const Future2 = require('/other/path/to/future');
 
 const m1 = Future1(noop);
 Future1.isFuture(m1) === (m1 instanceof Future1);
@@ -905,7 +885,7 @@ extension) you might run into the following issue:
 
 ```js
 const S = require('sanctuary');
-const Future = require('fluture');
+const Future = require("brisksale-algebraic-types").Future;
 S.I(Future.of(1));
 //! Since there is no type of which all the above values are members,
 //! the type-variable constraint has been violated.
@@ -920,12 +900,12 @@ To let Sanctuary know about Futures, we can provide it a `FutureType` using
 
 ```js
 const $ = require('sanctuary-def');
-const Future = require('fluture');
+const Future = require("brisksale-algebraic-types").Future;
 const {env, create} = require('sanctuary');
 
 const FutureType = $.BinaryType(
   Future.name,
-  'https://github.com/fluture-js/Fluture#future',
+  'https://github.com',
   Future.isFuture,
   Future.extractLeft,
   Future.extractRight
@@ -943,28 +923,17 @@ To reduce the boilerplate of making Node or Promise functions return Futures
 instead, one might use the [Futurize][1] library:
 
 ```js
-const Future = require('fluture');
+const Future = require("brisksale-algebraic-types").Future;
 const futurize = require('futurize').futurize(Future);
 const readFile = futurize(require('fs').readFile);
 readFile('README.md', 'utf8')
 .map(text => text.split('\n'))
 .map(lines => lines[0])
 .fork(console.error, console.log);
-//> "# [![Fluture](logo.png)](#butterfly)"
+
 ```
 
-## Benchmarks
 
-Simply run `node ./bench/<file>` to see how a specific method compares to
-implementations in `data.task` and `ramda-fantasy.Future`.
-
-## Butterfly
-
-The name "Fluture" is a conjunction of "FL" (the acronym to [Fantasy Land][FL])
-and "future". Fluture means butterfly in Romanian: A creature you might expect
-to see in Fantasy Land.
-
-Credits for the logo go to [Erik Fuente][8].
 
 ----
 
@@ -972,8 +941,7 @@ Credits for the logo go to [Erik Fuente][8].
 
 <!-- References -->
 
-[wiki:similar]:         https://github.com/fluture-js/Fluture/wiki/Comparison-of-Future-Implementations
-[wiki:promises]:        https://github.com/fluture-js/Fluture/wiki/Comparison-to-Promises
+
 
 [FL]:                   https://github.com/fantasyland/fantasy-land
 [FL1]:                  https://github.com/fantasyland/fantasy-land/tree/v1.0.1
@@ -1002,7 +970,6 @@ Credits for the logo go to [Erik Fuente][8].
 [$]:                    https://github.com/sanctuary-js/sanctuary-def
 [$:BinaryType]:         https://github.com/sanctuary-js/sanctuary-def#BinaryType
 
-[concurrify]:           https://github.com/fluture-js/concurrify
 
 [1]:                    https://github.com/futurize/futurize
 [2]:                    https://drboolean.gitbooks.io/mostly-adequate-guide/content/ch7.html
