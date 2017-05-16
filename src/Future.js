@@ -1,10 +1,4 @@
-////      ____ _         _
-////     / ___| |       | |_
-////    | |__ | | _   _ |  _\   _  ___  ___
-////    |  __|| || | | || || | | ||  _// _ \
-////    | |   | || |_| || || |_| || | |  __/
-////    |_|   |_| \__,_||_| \__,_||_|  \___\
-////
+
 (function(global, f){
 
   'use strict';
@@ -18,7 +12,7 @@
       require('sanctuary-type-identifiers')
     );
   }else{
-    global.Fluture = f(
+    global.Future = f(
       global.concurrify,
       global.inspectf,
       global.sanctuaryTypeClasses,
