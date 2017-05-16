@@ -1,14 +1,14 @@
 {
   "name": "brisksale-algebraic-types",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository" :
   { "type" : "git"
   , "url" : "https://github.com/brisksale/fantasyAlgebraicTypes.git"
   },
   "dependencies": {
     "ramda": ">=0.15.0",
-     "fluture": ">=6.0.1",
+     "fluture":"^5.0.0",
     "futurize": "^1.2.0"
   }
 }
