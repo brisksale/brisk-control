@@ -25,26 +25,26 @@ const dependencies = {
   'ramda': 'ramda'
 };
 
-export default {
-  entry: 'src/index.js',
-  plugins: [buble()],
-  external: Object.keys(dependencies),
-  globals: dependencies,
-  format: 'umd',
-  moduleName: 'brisksale-algebraic-types',
-  dest: 'dist/bundle.js'
-};
-
 // export default {
 //   entry: 'src/index.js',
-//   plugins: [resolve({
-//     customResolveOptions: {
-//       moduleDirectory: 'node_modules'
-//     }
-//   }), commonjs()],
+//   plugins: [buble()],
 //   external: Object.keys(dependencies),
 //   globals: dependencies,
-//   format: 'cjs',
+//   format: 'umd',
 //   moduleName: 'brisksale-algebraic-types',
-//   dest: 'index.js'
+//   dest: 'dist/bundle.js'
 // };
+
+export default {
+  entry: 'src/index.js',
+  plugins: [resolve({
+    customResolveOptions: {
+      moduleDirectory: 'node_modules'
+    }
+  }), commonjs()],
+  external: Object.keys(dependencies),
+  globals: dependencies,
+  format: 'cjs',
+  moduleName: 'brisksale-algebraic-types',
+  dest: 'index.js'
+};

@@ -18,17 +18,5 @@ export default {
   Tuple,
   Future:Action
 }
-// module.exports = {
-//   Action: require('./action/action'),
-//   Future: require('./action/action'),
-//   Identity: require('./Identity'),
-//   IO: require('./IO'),
-//   lift2: require('./lift2'),
-//   lift3: require('./lift3'),
-//   Maybe: require('./Maybe'),
-//   Reader: require('./Reader'),
-//   State: require('./State'),
-//   Tuple: require('./Tuple'),
-//   Futurize: require('futurize')
-// };
+
 
