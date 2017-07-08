@@ -1,9 +1,8 @@
-var toString = require('ramda/src/toString');
-var curry = require('ramda/src/curry');
+import {toString, curry} from "ramda";
+import * as util from './internal/util';
+import {toFastProperties} from './internal/toFastProp';
 
-var util = require('./internal/util.js');
-
-function Maybe(x) {
+export default function Maybe(x) {
   return x == null ? _nothing : Maybe.Just(x);
 }
 
@@ -153,4 +152,7 @@ Nothing.prototype.toString = function() {
   return 'Maybe.Nothing()';
 };
 
-module.exports = Maybe;
+//v8 optimization
+toFastProperties(Maybe);
+toFastProperties(Maybe.prototype);
+

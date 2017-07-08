@@ -1,3 +1,6 @@
 npm-debug.log
 .DS_Store
 node_modules/
+index.js
+test.js
+.vscode/

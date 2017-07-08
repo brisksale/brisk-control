@@ -1,18 +1,32 @@
 {
   "name": "brisksale-algebraic-types",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.0.5",
-  "repository" :
-  { "type" : "git"
-  , "url" : "https://github.com/brisksale/fantasyAlgebraicTypes.git"
+  "version": "0.1.0",
+  "module": "src/index.js",
+  "main": "index.js",
+  "license": "MIT" ,
+  "files": [
+    "index.js",
+    "src",
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brisksale/fantasyAlgebraicTypes.git"
   },
+  "author":"Dakota Murphy <dakota@brisksale.com>",
   "dependencies": {
-    "ramda": ">=0.15.0",
-     "fluture":"^5.0.0",
-    "futurize": "^1.2.0",
-    "concurrify": "^0.1.0",
-    "inspect-f": "^1.2.0",
-    "sanctuary-type-classes": "^3.0.0",
-    "sanctuary-type-identifiers": "^1.0.0"
+    "ramda": ">=0.15.0"
+  },
+  "devDependencies": {
+    "rollup": "^0.43.0",
+    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-flow": "^1.1.1",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-resolve": "^3.0.0"
+  },
+  "scripts": {
+    "build": "rollup -c"
   }
 }

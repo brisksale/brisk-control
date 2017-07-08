@@ -1,0 +1,9 @@
+export const OPEN = 2;
+export const CLOSED = 1;
+export const COLD =  4;
+export const PENDING = 8;
+export const REJECTED = 16;
+export const RESOLVED = 32;
+export const FULLFILLED = REJECTED | RESOLVED;
+export const ACTIVE = FULLFILLED | PENDING;
+export const NO_STATE = 0;

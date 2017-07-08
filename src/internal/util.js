@@ -1,67 +1,77 @@
-var _equals = require('ramda/src/equals');
+import { equals as _equals } from 'ramda';
+
+import { inspectf } from './view-fn';
+
+const startPosPad = (sf, s) =>
+  s.replace(/^/gm, sf).replace(sf, '');
+
+export const showFunction = f =>
+  startPosPad('  ', inspectf(2, f));
+
+export const emptyFn = function emptyFn() { };
 
 
-module.exports = {
 
-  baseMap: function(f) {
-    return f(this.value);
-  },
+export const baseMap = function (f) {
+  return f(this.value);
+}
 
-  getEquals: function(constructor) {
-    return function equals(that) {
-      return that instanceof constructor && _equals(this.value, that.value);
-    };
-  },
+export const getEquals = function (constructor) {
+  return function equals(that) {
+    return that instanceof constructor && _equals(this.value, that.value);
+  };
+}
 
-  extend: function(Child, Parent) {
-    function Ctor() {
-      this.constructor = Child;
-    }
-    Ctor.prototype = Parent.prototype;
-    Child.prototype = new Ctor();
-    Child.super_ = Parent.prototype;
-  },
+export const extend = function (Child, Parent) {
+  function Ctor() {
+    this.constructor = Child;
+  }
+  Ctor.prototype = Parent.prototype;
+  Child.prototype = new Ctor();
+  Child.super_ = Parent.prototype;
+}
 
-  identity: function(x) { return x; },
+export const identity = function (x) { return x; }
 
-  notImplemented: function(str) {
-    return function() {
-      throw new Error(str + ' is not implemented');
-    };
-  },
+export const notImplemented = function (str) {
+  return function () {
+    throw new Error(str + ' is not implemented');
+  };
+}
 
-  notCallable: function(fn) {
-    return function() {
-      throw new Error(fn + ' cannot be called directly');
-    };
-  },
+export const notCallable = function (fn) {
+  return function () {
+    throw new Error(fn + ' cannot be called directly');
+  };
+}
 
-  returnThis: function() { return this; },
+export const returnThis = function () { return this; }
 
-  chainRecNext: function(v) {
-    return { isNext: true, value: v };
-  },
+export const chainRecNext = function (v) {
+  return { isNext: true, value: v };
+}
 
-  chainRecDone: function(v) {
-    return { isNext: false, value: v };
-  },
+export const chainRecDone = function (v) {
+  return { isNext: false, value: v };
+}
 
-  deriveAp: function (Type) {
-    return function(fa) {
-      return this.chain(function (f) {
-        return fa.chain(function (a) {
-          return Type.of(f(a));
-        });
-      });
-    };
-  },
-
-  deriveMap: function (Type) {
-    return function (f) {
-      return this.chain(function (a) {
+export const deriveAp = function (Type) {
+  return function (fa) {
+    return this.chain(function (f) {
+      return fa.chain(function (a) {
         return Type.of(f(a));
       });
-    };
-  }
+    });
+  };
+}
 
-};
+export const deriveMap = function (Type) {
+  return function (f) {
+    return this.chain(function (a) {
+      return Type.of(f(a));
+    });
+  };
+}
+
+
+

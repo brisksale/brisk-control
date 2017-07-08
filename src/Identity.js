@@ -1,7 +1,6 @@
-var toString = require('ramda/src/toString');
-
-var util = require('./internal/util');
-
+import {toString} from "ramda";
+import * as util from './internal/util';
+import {toFastProperties} from './internal/toFastProp';
 
 /**
  * A data type that holds a value and exposes a monadic api.
@@ -13,7 +12,7 @@ var util = require('./internal/util');
  * @param {*} a Value of any type
  * @sig a -> Identity[a]
  */
-function Identity(x) {
+export default function Identity(x) {
   if (!(this instanceof Identity)) {
     return new Identity(x);
   }
@@ -94,4 +93,7 @@ Identity.prototype.toString = function() {
   return 'Identity(' + toString(this.value) + ')';
 };
 
-module.exports = Identity;
+
+//v8 optimization
+toFastProperties(Identity);
+toFastProperties(Identity.prototype);

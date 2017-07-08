@@ -1,10 +1,9 @@
-var curry = require('ramda/src/curry');
-var toString = require('ramda/src/toString');
+"use strict"
+import {toString, curry} from "ramda";
+import * as util from './internal/util';
+import {toFastProperties} from './internal/toFastProp';
 
-var util = require('./internal/util');
-
-
-function Either(left, right) {
+export default function Either(left, right) {
   switch (arguments.length) {
     case 0:
       throw new TypeError('no arguments to Either');
@@ -132,4 +131,6 @@ Either.prototype.either = function instanceEither(leftFn, rightFn) {
   return this.isLeft ? leftFn(this.value) : rightFn(this.value);
 };
 
-module.exports = Either;
+//v8 optimization
+toFastProperties(Either);
+toFastProperties(Either.prototype);

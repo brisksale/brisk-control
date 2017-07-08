@@ -1,10 +1,7 @@
-var compose = require('ramda/src/compose');
-var identity = require('ramda/src/identity');
-var toString = require('ramda/src/toString');
-var always = require('ramda/src/always');
+import {toString, compose, identity, always} from "ramda";
+import {toFastProperties} from './internal/toFastProp';
 
-
-function Reader(run) {
+export default function Reader(run) {
   if (!(this instanceof Reader)) {
     return new Reader(run);
   }
@@ -97,4 +94,6 @@ Reader.T = function(M) {
   return ReaderT;
 };
 
-module.exports = Reader;
+//v8 optimization
+toFastProperties(Reader);
+toFastProperties(Reader.prototype);

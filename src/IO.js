@@ -1,11 +1,8 @@
-var compose = require('ramda/src/compose');
-var toString = require('ramda/src/toString');
+import {toString, compose} from "ramda";
+import * as util from './internal/util';
+import {toFastProperties} from './internal/toFastProp';
 
-var util = require('./internal/util');
-
-module.exports = IO;
-
-function IO(fn) {
+export default function IO(fn) {
   if (!(this instanceof IO)) {
     return new IO(fn);
   }
@@ -66,3 +63,7 @@ IO.of = IO.prototype.of;
 IO.prototype.toString = function() {
   return 'IO(' + toString(this.fn) + ')';
 };
+
+//v8 optimization
+toFastProperties(IO);
+toFastProperties(IO.prototype);

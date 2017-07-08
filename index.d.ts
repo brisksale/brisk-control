@@ -16,6 +16,7 @@ declare module 'brisksale-algebraic-types' {
     cache<E, A>(f: Future<E, A>): Future<E, A>;
     of<E, A>(x: A): Future<E, A>;
     reject<E, A>(val: E): Future<E, A>;
+    fork(reject: (v: E) => void, resolve: (v: A) => void, future:Future<E,A>): void;
   }
 
   export const Future: FutureStatic;

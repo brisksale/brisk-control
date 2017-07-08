@@ -1,8 +1,7 @@
-var toString = require('ramda/src/toString');
-var equals = require('ramda/src/equals');
+import {toString, equals} from "ramda";
+import {toFastProperties} from './internal/toFastProp';
 
-
-function Tuple(x, y) {
+export default function Tuple(x, y) {
   switch (arguments.length) {
     case 0:
       throw new TypeError('no arguments to Tuple');
@@ -65,4 +64,3 @@ _Tuple.prototype.toString = function() {
   return 'Tuple(' + toString(this[0]) + ', ' + toString(this[1]) + ')';
 };
 
-module.exports = Tuple;

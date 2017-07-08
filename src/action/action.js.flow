@@ -1,0 +1,106 @@
+// /* @flow */
+// type Fn1<A, B> = (a: A) => B // a unary function
+
+// // Create the global type ActionInstance
+// // Rej = type of returned rejected value
+// // Res = type of returned resolved value
+// class ActionInstance<Rej, Res> {
+//   map: <T>(fn: Fn1<Res, T>) => ActionInstance<Rej,T>;
+//   bimap: <A, B>(left: Fn1<Rej, A>, right: Fn1<Res, B>) => ActionInstance<A, B>;
+//   chain: <A, B>(fn: (a: Res) => ActionInstance<A, B>) => ActionInstance<A, B>;
+//   swap: () => ActionInstance<Res, Rej>;
+//   mapRej: <T>(fn: Fn1<Rej, T>) => ActionInstance<T, Res>;
+//   chainRej: <T>(fn: (a: Rej) => ActionInstance<Rej, T>) => ActionInstance<Rej, T>;
+//   // We can't type fold with 2 different types of left and right
+//   fold: <T>(left: Fn1<Rej, T>, right: Fn1<Res, T>) => ActionInstance<void, T>;
+//   // We can't infer the type of applied Res(B)
+//   ap: <A, B>(a: ActionInstance<A, B>) => ActionInstance<A, *>;
+//   // We can't infer the first reject or resolve
+//   and: <A, B>(a: ActionInstance<A, B>) => ActionInstance<A, B>;
+//   // We can't infer the last reject or resolve
+//   or: <A, B>(a: ActionInstance<A, B>) => ActionInstance<A, B>;
+
+//   finally: (a: ActionInstance<*, *>) => ActionInstance<Rej, Res>;
+//   lastly: (a: ActionInstance<*, *>) => ActionInstance<Rej, Res>;
+//   exec: (rej: Fn1<Rej, *>, res: Fn1<Res, *>) => () => *;
+//   fork: (rej: Fn1<Rej, *>, res: Fn1<Res, *>) => () => *;
+//   value: (res: Fn1<Res, *>) => () => *;
+//   promise: () => Promise<Res>;
+//   both: <A, B>(a: ActionInstance<A, B>) => ActionInstance<A, B>;
+//   // We can't infer the first reject or resolve
+//   race: <A, B>(a: ActionInstance<A, B>) => ActionInstance<A, B>;
+//   hook: <C, D>(fn: (a: Res) => ActionInstance<Rej, C>,
+//    fn: (a: Res) => ActionInstance<Rej, D>
+//   ) => ActionInstance<Rej, D>;
+
+//   cache:() => ActionInstance<Res, Rej>;
+
+// }
+
+
+// declare type Computation<Rej, Res> = (
+//   rej: Fn1<Rej, void>,
+//   res: Fn1<Res, void>
+// ) => void
+
+// declare type NodeBack<Rej, Res> = (rej: Rej, res: Res) => void
+
+// class Action {
+//   static of: <T>(a: T) => ActionInstance<void, T>;
+//   static reject: <T>(a: T) => ActionInstance<T, void>;
+//   static after: <T>(a: number, b: T) => ActionInstance<void, T>;
+//   rejectAfter: <T>(a: number, b: T) => ActionInstance<T, void>;
+//   cache: <Rej, Res>(a: ActionInstance<Rej, Res>) => ActionInstance<Rej, Res>;
+//   chainRec:<Next, Done, x, Res, Rej, Iteration>(
+//     f:(fn:(a:x) => Next, fn2: (b:Res) => Done, c:x) => ActionInstance<Rej, Iteration>, d:x
+//   ) => ActionInstance<Rej, Res>;
+//   ap: <A, B>(val:A, func:B) => *;
+//   map: <Fn, M>(f:Fn, m:M) => M;
+//   do: <T>(f:() => T) => ActionInstance<void, T>;
+//   try: <T>(x:() => T) => ActionInstance<void, T>;
+//   node: <Rej, Res>(x:(done: NodeBack<Rej, Res>) => void) => ActionInstance<Rej, Res>;
+//   Action: Action;
+//   verifyAction: <T>(x:T) => boolean;
+//   wrap: <A, B>(fn: (a: A) => B) => (a: A) => ActionInstance<*, B>;
+//   wrap2: <A1, A2, B>(
+//     fn: (a1: A1, a2: A2) => B
+//   ) => (a1: A1, a2: A2) => ActionInstance<*, B>;
+//   wrap3: <A1, A2, A3, B>(
+//     fn: (a1: A1, a2: A2, a3: A3) => B
+//   ) => (a1: A1, a2: A2, a3: A3) => ActionInstance<*, B>;
+//   fromPromise: <A, B>(fn: (a: A) => Promise<B>) => (a: A) => ActionInstance<*, B>;
+//   fromPromise2: <A1, A2, B>(
+//     fn: (a1: A1, a2: A2) => Promise<B>
+//   ) => (a1: A1, a2: A2) => ActionInstance<*, B>;
+//   fromPromise3: <A1, A2, A3, B>(
+//     fn: (a1: A1, a2: A2, a3: A3) => Promise<B>
+//   ) => (a1: A1, a2: A2, a3: A3) => ActionInstance<*, B>;
+//   hook: <A, B, C, D>(
+//     f1: ActionInstance<A, B>,
+//     f2: (b: B) => ActionInstance<A, C>
+//   ) => (f3: (c: B) => ActionInstance<A, D>) => ActionInstance<A, D>;
+
+//   both: <A, B>(a: ActionInstance<A, B>, b:ActionInstance<A, B>) => ActionInstance<A, B>;
+//   // We can't infer the combined types of all Actions
+//   parallel: (a: number, b: Array<ActionInstance<*, *>>) => ActionInstance<*, *>;
+
+//   chainRej: <A, B, C>(x:(a:A) => ActionInstance<A, C>, y:ActionInstance<A, B>) => ActionInstance<A, C>;
+//   mapRej: <A, B, C>(x: (a:A) => B, y:ActionInstance<A, C>) => ActionInstance<B, C>;
+//   value:<Rej, Res, Cancel>(x:(b:Rej) => void, y:ActionInstance<Rej, Res>) => Cancel;
+//   or: <A, B>(a: ActionInstance<A, B>, b:ActionInstance<A, B>) => ActionInstance<A, B>;
+//   finally: <A, B, C>(a: ActionInstance<A, C>, b:ActionInstance<A, B>) => ActionInstance<A, B>;
+//   swap: <A, B>(x:ActionInstance<A, B>) => ActionInstance<B, A>;
+//   promise: <Res>(x:ActionInstance<*, Res>) => Promise<Res>;
+//   fork: <Rej, Res>(rej: Fn1<Rej, *>, res: Fn1<Res, *>, a:ActionInstance<Rej, Res>) => () => *;
+//   exec: <Rej, Res>(rej: Fn1<Rej, *>, res: Fn1<Res, *>, a:ActionInstance<Rej, Res>) => () => *;
+//   // No idea how to type this
+//   Par: any;
+//   seq: any;
+//   fold: <T, Rej, Res>(left: Fn1<Rej, T>, right: Fn1<Res, T>, a:ActionInstance<Rej, Res>) => ActionInstance<void, T>;
+//   verifyAction: (a: *) => boolean;
+//   never: () => ActionInstance<void, void>;
+ 
+//   // (fn: Computation<Rej, Res>) => ActionInstance<Rej, Res>;
+// }
+
+// export default typeof Action;

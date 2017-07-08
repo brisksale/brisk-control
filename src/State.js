@@ -1,8 +1,8 @@
-var curry = require('ramda/src/curry');
-
-var Identity = require('./Identity');
-var Tuple = require('./Tuple');
-var util = require('./internal/util');
+import Identity from './Identity';
+import Tuple from './Tuple';
+import {curry} from "ramda";
+import * as util from './internal/util';
+import {toFastProperties} from './internal/toFastProp';
 
 
 function T(M) {
@@ -76,11 +76,10 @@ function T(M) {
 
   return StateT;
 }
-
-var State = T(Identity);
+const State = T(Identity);
+export default State;
 State.T = T;
 State.prototype.run = function(s) {
   return this._run(s).value;
 };
 
-module.exports = State;
