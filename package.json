@@ -1,14 +1,15 @@
 {
   "name": "brisksale-algebraic-types",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "module": "src/index.js",
   "main": "index.js",
   "license": "MIT" ,
   "files": [
     "index.js",
     "src",
-    "dist"
+    "dist",
+    "index.d.ts"
   ],
   "repository": {
     "type": "git",
