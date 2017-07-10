@@ -1,25 +1,25 @@
 declare module 'brisksale-algebraic-types' {
   import { CurriedFunction2 } from 'ramda';
 
-  interface Future<E, A>  {
-    fork(reject: (v: E) => void, resolve: (v: A) => void): void;
+  interface Action<E, A>  {
+    exec(reject: (v: E) => void, resolve: (v: A) => void): void;
     ap(f: any): any;
-    map<A2>(fb: (e: A) => A2): Future<E, A2>;
-    bimap<E2, A2>(errFn: (value: E) => E2, successFn: (value: A) => A2): Future<E2, A2>;
-    chain<A2>(fn: (v: A) => Future<E, A2>): Future<E, A2>;
-    chainReject<A2>(fn: (value: E) => Future<E, A2>): Future<E, A2>;
+    map<A2>(fb: (e: A) => A2): Action<E, A2>;
+    bimap<E2, A2>(errFn: (value: E) => E2, successFn: (value: A) => A2): Action<E2, A2>;
+    chain<A2>(fn: (v: A) => Action<E, A2>): Action<E, A2>;
+    chainReject<A2>(fn: (value: E) => Action<E, A2>): Action<E, A2>;
   }
 
-  interface FutureStatic {
-    <E, A>(fn: (reject: (v: E) => void, resolve: (v: A) => void) => void): Future<E, A>
-    new <E, A>(fn: (reject: (v: E) => void, resolve: (v: A) => void) => void): Future<E, A>;
-    cache<E, A>(f: Future<E, A>): Future<E, A>;
-    of<E, A>(x: A): Future<E, A>;
-    reject<E, A>(val: E): Future<E, A>;
-    fork(reject: (v: E) => void, resolve: (v: A) => void, future:Future<E,A>): void;
+  interface ActionStatic {
+    <E, A>(fn: (reject: (v: E) => void, resolve: (v: A) => void) => void): Action<E, A>
+    new <E, A>(fn: (reject: (v: E) => void, resolve: (v: A) => void) => void): Action<E, A>;
+    cache<E, A>(f: Action<E, A>): Action<E, A>;
+    of<E, A>(x: A): Action<E, A>;
+    reject<E, A>(val: E): Action<E, A>;
+    exec(reject: (v: E) => void, resolve: (v: A) => void, Action:Action<E,A>): void;
   }
 
-  export const Future: FutureStatic;
+  export const Action: ActionStatic;
 
   interface IO<T> {
     ap<T2, T3>(thatIo: IO<T2>): IO<T3>;
