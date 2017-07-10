@@ -259,8 +259,7 @@ Creates a Action which rejects with the first argument given to the function,
 or resolves with the second if the first is not present.
 
 This is a convenience for NodeJS users who wish to easily obtain a Action from
-a node style callback API. To permanently turn a function into one that returns
-a Action, check out [futurization](#futurization).
+a node style callback API.
 
 ```js
 Action.node(done => fs.readFile('package.json', 'utf8', done))
