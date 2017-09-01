@@ -1,7 +1,7 @@
 {
-  "name": "brisksale-algebraic-types",
-  "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.1.2",
+  "name": "brisk-control",
+  "description": "Fantasy Land compatible types for easy integration with functional  libraries like ramda",
+  "version": "0.0.1",
   "module": "src/index.js",
   "main": "index.js",
   "license": "MIT" ,
@@ -17,7 +17,6 @@
   },
   "author":"Dakota Murphy <dakota@brisksale.com>",
   "dependencies": {
-    "ramda": ">=0.15.0"
   },
   "devDependencies": {
     "rollup": "^0.43.0",

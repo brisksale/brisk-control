@@ -22,7 +22,7 @@ import curryN from "../internal/curry";
 import {makeParallel} from '../internal/parallel';
 import {toFastProperties} from '../internal/toFastProp';
 
-const action_type = 'BriskSale/Action';
+const action_type = 'brisk-control/Action';
 const verifyAction = m => 
   m instanceof Action || type(m) === action_type;
 

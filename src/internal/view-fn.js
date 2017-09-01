@@ -16,10 +16,10 @@
     }
   }
 
-  var RSPACE = /^ */;
-  var RCODE = /\s*[^\s]/;
-  var RTABS = /\t/g;
-  var REOL = /\n\r?/;
+  const RSPACE = /^ */;
+  const RCODE = /\s*[^\s]/;
+  const RTABS = /\t/g;
+  const REOL = /\n\r?/;
 
   function isCode(line) {
     return RCODE.test(line);
@@ -30,10 +30,10 @@
   }
 
   function guessIndentation(lines) {
-    var filtered = lines.filter(isCode);
-    var paddings = filtered.map(getPadding);
-    var depth = paddings.reduce(Math.min, Infinity);
-    var tabsize = paddings
+    const filtered = lines.filter(isCode);
+    const paddings = filtered.map(getPadding);
+    const depth = paddings.reduce(Math.min, Infinity);
+    const tabsize = paddings
     .map(function(x) { return x - depth; })
     .find(function(x) { return x > 1; }) || 2;
     return {depth: depth, tabsize: tabsize};
@@ -52,8 +52,8 @@
   }
 
   function fixIndentation(lines, indentation) {
-    var info = guessIndentation(lines.slice(1));
-    var RPAD = new RegExp(pad(info.tabsize), 'g');
+    const info = guessIndentation(lines.slice(1));
+    const RPAD = new RegExp(pad(info.tabsize), 'g');
     return lines.map(function(line) {
       return line.slice(Math.min(info.depth, getPadding(line)))
       .replace(RPAD, '\t').replace(RTABS, indentation);
@@ -67,7 +67,7 @@
     }
     checkf(f);
     if(f.toString !== Function.prototype.toString) {return f.toString();}
-    var i = pad(n), shown = show(f, i), lines = toLines(shown, i);
+    let i = pad(n), shown = show(f, i), lines = toLines(shown, i);
     if(lines.length < 2) {return shown;}
     return fixIndentation(lines, i);
   };

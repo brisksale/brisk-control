@@ -4,3 +4,4 @@ node_modules/
 index.js
 test.js
 .vscode/
+src/.DS_Store

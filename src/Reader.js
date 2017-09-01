@@ -1,4 +1,4 @@
-import {toString, compose, identity, always} from "ramda";
+import {toString} from './internal/helper';
 import {toFastProperties} from './internal/toFastProp';
 
 export default function Reader(run) {
@@ -40,7 +40,7 @@ Reader.prototype.of = function(a) {
 };
 Reader.of = Reader.prototype.of;
 
-Reader.ask = Reader(identity);
+Reader.ask = Reader(x=>x);
 
 Reader.prototype.toString = function() {
   return 'Reader(' + toString(this.run) + ')';
@@ -54,7 +54,7 @@ Reader.T = function(M) {
     this.run = run;
   };
 
-  ReaderT.lift = compose(ReaderT, always);
+  ReaderT.lift = x => ReaderT(_ => x)
 
   ReaderT.ask = ReaderT(M.of);
 

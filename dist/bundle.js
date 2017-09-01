@@ -1,8 +1,1293 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ramda')) :
-	typeof define === 'function' && define.amd ? define(['ramda'], factory) :
-	(global['brisksale-algebraic-types'] = factory(global.ramda));
-}(this, (function (ramda) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global['brisk-control'] = factory());
+}(this, (function () { 'use strict';
+
+var fastProto = null;
+//%HasFastProperties
+// --allow-natives-syntax to check whether an object has fast properties.
+function FastObject(o) {
+	if (fastProto !== null && typeof fastProto.property) {
+		var result = fastProto;
+		fastProto = FastObject.prototype = null;
+		return result;
+	}
+	fastProto = FastObject.prototype = o == null ? Object.create(null) : o;
+	return new FastObject;
+}
+
+// Initialize the inline property cache of FastObject
+FastObject();
+
+function toFastProperties(o) {
+	return FastObject(o);
+}
+
+/**
+ * 
+ * this file was based of of ramdas toString function
+ * I choose to do this to remove all dependencies from this library 
+ * so it may look like this file is over doing it a bit. But thats ok.
+ */
+
+var arity = function arity(n, fn) {
+  switch (n) {
+    case 0:
+      return function () {
+        return fn.apply(this, arguments);
+      };
+    case 1:
+      return function (a0) {
+        return fn.apply(this, arguments);
+      };
+    case 2:
+      return function (a0, a1) {
+        return fn.apply(this, arguments);
+      };
+    case 3:
+      return function (a0, a1, a2) {
+        return fn.apply(this, arguments);
+      };
+    case 4:
+      return function (a0, a1, a2, a3) {
+        return fn.apply(this, arguments);
+      };
+    case 5:
+      return function (a0, a1, a2, a3, a4) {
+        return fn.apply(this, arguments);
+      };
+    case 6:
+      return function (a0, a1, a2, a3, a4, a5) {
+        return fn.apply(this, arguments);
+      };
+    case 7:
+      return function (a0, a1, a2, a3, a4, a5, a6) {
+        return fn.apply(this, arguments);
+      };
+    case 8:
+      return function (a0, a1, a2, a3, a4, a5, a6, a7) {
+        return fn.apply(this, arguments);
+      };
+    case 9:
+      return function (a0, a1, a2, a3, a4, a5, a6, a7, a8) {
+        return fn.apply(this, arguments);
+      };
+    case 10:
+      return function (a0, a1, a2, a3, a4, a5, a6, a7, a8, a9) {
+        return fn.apply(this, arguments);
+      };
+    default:
+      throw new Error('First argument to arity must be a non-negative integer no greater than ten');
+  }
+};
+
+var arrayFromIterator = function arrayFromIterator(iter) {
+  var list = [];
+  var next;
+  while (!(next = iter.next()).done) {
+    list.push(next.value);
+  }
+  return list;
+};
+
+var complement = function complement(f) {
+  return function () {
+    return !f.apply(this, arguments);
+  };
+};
+
+var _filter = function _filter(fn, list) {
+  var idx = 0;
+  var len = list.length;
+  var result = [];
+  while (idx < len) {
+    if (fn(list[idx])) {
+      result[result.length] = list[idx];
+    }
+    idx += 1;
+  }
+  return result;
+};
+
+// String(x => x) evaluates to "x => x", so the pattern may not match.
+var functionName = function functionName(f) {
+  // String(x => x) evaluates to "x => x", so the pattern may not match.
+  var match = String(f).match(/^function (\w*)/);
+  return match == null ? '' : match[1];
+};
+
+function has(prop, obj) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+var _isArguments = function () {
+  var toString = Object.prototype.toString;
+  return toString.call(arguments) === '[object Arguments]' ? function _isArguments(x) {
+    return toString.call(x) === '[object Arguments]';
+  } : function _isArguments(x) {
+    return has('callee', x);
+  };
+}();
+
+
+var _isArray = Array.isArray || function _isArray(val) {
+  return val != null && val.length >= 0 && Object.prototype.toString.call(val) === '[object Array]';
+};
+
+var _isObject = function _isObject(x) {
+  return Object.prototype.toString.call(x) === '[object Object]';
+};
+
+var _isString = function _isString(x) {
+  return Object.prototype.toString.call(x) === '[object String]';
+};
+
+var _isTransformer = function _isTransformer(obj) {
+  return typeof obj['@@transducer/step'] === 'function';
+};
+
+var _map = function _map(fn, functor) {
+  var idx = 0;
+  var len = functor.length;
+  var result = Array(len);
+  while (idx < len) {
+    result[idx] = fn(functor[idx]);
+    idx += 1;
+  }
+  return result;
+};
+
+var _quote = function _quote(s) {
+  var escaped = s.replace(/\\/g, '\\\\').replace(/[\b]/g, '\\b')    // \b matches word boundary; [\b] matches backspace
+    .replace(/\f/g, '\\f').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t').replace(/\v/g, '\\v').replace(/\0/g, '\\0');
+  return '"' + escaped.replace(/"/g, '\\"') + '"';
+};
+
+var _toISOString = function () {
+  var pad = function pad(n) {
+    return (n < 10 ? '0' : '') + n;
+  };
+  return typeof Date.prototype.toISOString === 'function' ? function _toISOString(d) {
+    return d.toISOString();
+  } : function _toISOString(d) {
+    return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) + '.' + (d.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) + 'Z';
+  };
+}();
+
+var _xfBase = {
+  init: function () {
+    return this.xf['@@transducer/init']();
+  },
+  result: function (result) {
+    return this.xf['@@transducer/result'](result);
+  }
+};
+
+var _xwrap = function () {
+  function XWrap(fn) {
+    this.f = fn;
+  }
+  XWrap.prototype['@@transducer/init'] = function () {
+    throw new Error('init not implemented on XWrap');
+  };
+  XWrap.prototype['@@transducer/result'] = function (acc) {
+    return acc;
+  };
+  XWrap.prototype['@@transducer/step'] = function (acc, x) {
+    return this.f(acc, x);
+  };
+  return function _xwrap(fn) {
+    return new XWrap(fn);
+  };
+}();
+
+function isFunction(x) {
+  return Object.prototype.toString.call(x) === '[object Function]';
+}
+
+var _curry2 = function _curry2(fn) {
+  return function f2(a, b) {
+    switch (arguments.length) {
+      case 0:
+        return f2;
+      case 1:
+        return function (_b) {
+          return fn(a, _b);
+        };
+      default:
+        return fn(a, b);
+    }
+  };
+};
+
+var _dispatchable = function _dispatchable(methodNames, xf, fn) {
+  return function () {
+    if (arguments.length === 0) {
+      return fn();
+    }
+    var args = Array.prototype.slice.call(arguments, 0);
+    var obj = args.pop();
+    if (!_isArray(obj)) {
+      var idx = 0;
+      while (idx < methodNames.length) {
+        if (typeof obj[methodNames[idx]] === 'function') {
+          return obj[methodNames[idx]].apply(obj, args);
+        }
+        idx += 1;
+      }
+      if (_isTransformer(obj)) {
+        var transducer = xf.apply(null, args);
+        return transducer(obj);
+      }
+    }
+    return fn.apply(this, arguments);
+  };
+};
+
+var _isArrayLike = function isArrayLike(x) {
+  if (_isArray(x)) {
+    return true;
+  }
+  if (!x) {
+    return false;
+  }
+  if (typeof x !== 'object') {
+    return false;
+  }
+  if (_isString(x)) {
+    return false;
+  }
+  if (x.nodeType === 1) {
+    return !!x.length;
+  }
+  if (x.length === 0) {
+    return true;
+  }
+  if (x.length > 0) {
+    return x.hasOwnProperty(0) && x.hasOwnProperty(x.length - 1);
+  }
+  return false;
+};
+
+var _xfilter = function () {
+  function XFilter(f, xf) {
+    this.xf = xf;
+    this.f = f;
+  }
+  XFilter.prototype['@@transducer/init'] = _xfBase.init;
+  XFilter.prototype['@@transducer/result'] = _xfBase.result;
+  XFilter.prototype['@@transducer/step'] = function (result, input) {
+    return this.f(input) ? this.xf['@@transducer/step'](result, input) : result;
+  };
+  return _curry2(function _xfilter(f, xf) {
+    return new XFilter(f, xf);
+  });
+}();
+
+var bind = function bind(fn, thisObj) {
+  return arity(fn.length, function () {
+    return fn.apply(thisObj, arguments);
+  });
+};
+
+var identical = function identical(a, b) {
+  // SameValue algorithm
+  if (a === b) {
+    // Steps 1-5, 7-10
+    // Steps 6.b-6.e: +0 != -0
+    return a !== 0 || 1 / a === 1 / b;
+  } else {
+    // Step 6.a: NaN == NaN
+    return a !== a && b !== b;
+  }
+};
+
+var keys = function () {
+  // cover IE < 9 keys issues
+  var hasEnumBug = !{ toString: null }.propertyIsEnumerable('toString');
+  var nonEnumerableProps = [
+    'constructor',
+    'valueOf',
+    'isPrototypeOf',
+    'toString',
+    'propertyIsEnumerable',
+    'hasOwnProperty',
+    'toLocaleString'
+  ];
+  // Safari bug
+  var hasArgsEnumBug = function () {
+    'use strict';
+    return arguments.propertyIsEnumerable('length');
+  }();
+  var contains = function contains(list, item) {
+    var idx = 0;
+    while (idx < list.length) {
+      if (list[idx] === item) {
+        return true;
+      }
+      idx += 1;
+    }
+    return false;
+  };
+  return typeof Object.keys === 'function' && !hasArgsEnumBug ? function keys(obj) {
+    return Object(obj) !== obj ? [] : Object.keys(obj);
+  } : function keys(obj) {
+    if (Object(obj) !== obj) {
+      return [];
+    }
+    var prop, nIdx;
+    var ks = [];
+    var checkArgsLength = hasArgsEnumBug && _isArguments(obj);
+    for (prop in obj) {
+      if (has(prop, obj) && (!checkArgsLength || prop !== 'length')) {
+        ks[ks.length] = prop;
+      }
+    }
+    if (hasEnumBug) {
+      nIdx = nonEnumerableProps.length - 1;
+      while (nIdx >= 0) {
+        prop = nonEnumerableProps[nIdx];
+        if (has(prop, obj) && !contains(ks, prop)) {
+          ks[ks.length] = prop;
+        }
+        nIdx -= 1;
+      }
+    }
+    return ks;
+  }
+}();
+
+var type = function type(val) {
+  return val === null ? 'Null' : val === undefined ? 'Undefined' : Object.prototype.toString.call(val).slice(8, -1);
+};
+
+// Values of other types are only equal if identical.
+var _equals = function _equals(a, b, stackA, stackB) {
+  if (identical(a, b)) {
+    return true;
+  }
+  if (type(a) !== type(b)) {
+    return false;
+  }
+  if (a == null || b == null) {
+    return false;
+  }
+  if (typeof a['fantasy-land/equals'] === 'function' || typeof b['fantasy-land/equals'] === 'function') {
+    return typeof a['fantasy-land/equals'] === 'function' && a['fantasy-land/equals'](b) && typeof b['fantasy-land/equals'] === 'function' && b['fantasy-land/equals'](a);
+  }
+  if (typeof a.equals === 'function' || typeof b.equals === 'function') {
+    return typeof a.equals === 'function' && a.equals(b) && typeof b.equals === 'function' && b.equals(a);
+  }
+  switch (type(a)) {
+    case 'Arguments':
+    case 'Array':
+    case 'Object':
+      if (typeof a.constructor === 'function' && functionName(a.constructor) === 'Promise') {
+        return a === b;
+      }
+      break;
+    case 'Boolean':
+    case 'Number':
+    case 'String':
+      if (!(typeof a === typeof b && identical(a.valueOf(), b.valueOf()))) {
+        return false;
+      }
+      break;
+    case 'Date':
+      if (!identical(a.valueOf(), b.valueOf())) {
+        return false;
+      }
+      break;
+    case 'Error':
+      return a.name === b.name && a.message === b.message;
+    case 'RegExp':
+      if (!(a.source === b.source && a.global === b.global && a.ignoreCase === b.ignoreCase && a.multiline === b.multiline && a.sticky === b.sticky && a.unicode === b.unicode)) {
+        return false;
+      }
+      break;
+    case 'Map':
+    case 'Set':
+      if (!_equals(arrayFromIterator(a.entries()), arrayFromIterator(b.entries()), stackA, stackB)) {
+        return false;
+      }
+      break;
+    case 'Int8Array':
+    case 'Uint8Array':
+    case 'Uint8ClampedArray':
+    case 'Int16Array':
+    case 'Uint16Array':
+    case 'Int32Array':
+    case 'Uint32Array':
+    case 'Float32Array':
+    case 'Float64Array':
+      break;
+    case 'ArrayBuffer':
+      break;
+    default:
+      // Values of other types are only equal if identical.
+      return false;
+  }
+  var keysA = keys(a);
+  if (keysA.length !== keys(b).length) {
+    return false;
+  }
+  var idx = stackA.length - 1;
+  while (idx >= 0) {
+    if (stackA[idx] === a) {
+      return stackB[idx] === b;
+    }
+    idx -= 1;
+  }
+  stackA.push(a);
+  stackB.push(b);
+  idx = keysA.length - 1;
+  while (idx >= 0) {
+    var key = keysA[idx];
+    if (!(has(key, b) && _equals(b[key], a[key], stackA, stackB))) {
+      return false;
+    }
+    idx -= 1;
+  }
+  stackA.pop();
+  stackB.pop();
+  return true;
+};
+
+var _reduce = function () {
+  function _arrayReduce(xf, acc, list) {
+    var idx = 0;
+    var len = list.length;
+    while (idx < len) {
+      acc = xf['@@transducer/step'](acc, list[idx]);
+      if (acc && acc['@@transducer/reduced']) {
+        acc = acc['@@transducer/value'];
+        break;
+      }
+      idx += 1;
+    }
+    return xf['@@transducer/result'](acc);
+  }
+  function _iterableReduce(xf, acc, iter) {
+    var step = iter.next();
+    while (!step.done) {
+      acc = xf['@@transducer/step'](acc, step.value);
+      if (acc && acc['@@transducer/reduced']) {
+        acc = acc['@@transducer/value'];
+        break;
+      }
+      step = iter.next();
+    }
+    return xf['@@transducer/result'](acc);
+  }
+  function _methodReduce(xf, acc, obj, methodName) {
+    return xf['@@transducer/result'](obj[methodName](bind(xf['@@transducer/step'], xf), acc));
+  }
+  var symIterator = typeof Symbol !== 'undefined' ? Symbol.iterator : '@@iterator';
+  return function _reduce(fn, acc, list) {
+    if (typeof fn === 'function') {
+      fn = _xwrap(fn);
+    }
+    if (_isArrayLike(list)) {
+      return _arrayReduce(fn, acc, list);
+    }
+    if (typeof list['fantasy-land/reduce'] === 'function') {
+      return _methodReduce(fn, acc, list, 'fantasy-land/reduce');
+    }
+    if (list[symIterator] != null) {
+      return _iterableReduce(fn, acc, list[symIterator]());
+    }
+    if (typeof list.next === 'function') {
+      return _iterableReduce(fn, acc, list);
+    }
+    if (typeof list.reduce === 'function') {
+      return _methodReduce(fn, acc, list, 'reduce');
+    }
+    throw new TypeError('reduce: list must be array or iterable');
+  };
+}();
+
+function equals(a, b) {
+  return _equals(a, b, [], []);
+}
+
+var filter = _dispatchable(['filter'], _xfilter, function (pred, filterable) {
+  return _isObject(filterable) ? _reduce(function (acc, key) {
+    if (pred(filterable[key])) {
+      acc[key] = filterable[key];
+    }
+    return acc;
+  }, {}, keys(filterable)) : // else
+    _filter(pred, filterable);
+});
+
+var reject = function reject(pred, filterable) {
+  return filter(complement(pred), filterable);
+};
+
+var _indexOf = function _indexOf(list, a, idx) {
+  var inf, item;
+  // Array.prototype.indexOf doesn't exist below IE9
+  if (typeof list.indexOf === 'function') {
+    switch (typeof a) {
+      case 'number':
+        if (a === 0) {
+          // manually crawl the list to distinguish between +0 and -0
+          inf = 1 / a;
+          while (idx < list.length) {
+            item = list[idx];
+            if (item === 0 && 1 / item === inf) {
+              return idx;
+            }
+            idx += 1;
+          }
+          return -1;
+        } else if (a !== a) {
+          // NaN
+          while (idx < list.length) {
+            item = list[idx];
+            if (typeof item === 'number' && item !== item) {
+              return idx;
+            }
+            idx += 1;
+          }
+          return -1;
+        }
+        // non-zero numbers can utilise Set
+        return list.indexOf(a, idx);
+      // all these types can utilise Set
+      case 'string':
+      case 'boolean':
+      case 'function':
+      case 'undefined':
+        return list.indexOf(a, idx);
+      case 'object':
+        if (a === null) {
+          // null can utilise Set
+          return list.indexOf(a, idx);
+        }
+    }
+  }
+  // anything else not covered above, defer to R.equals
+  while (idx < list.length) {
+    if (equals(list[idx], a)) {
+      return idx;
+    }
+    idx += 1;
+  }
+  return -1;
+};
+
+var _contains = function _contains(a, list) {
+  return _indexOf(list, a, 0) >= 0;
+};
+
+//  mapPairs :: (Object, [String]) -> [String]
+var _toString = function _toString(x, seen) {
+  var recur = function recur(y) {
+    var xs = seen.concat([x]);
+    return _contains(y, xs) ? '<Circular>' : _toString(y, xs);
+  };
+  //  mapPairs :: (Object, [String]) -> [String]
+  var mapPairs = function (obj, keys) {
+    return _map(function (k) {
+      return _quote(k) + ': ' + recur(obj[k]);
+    }, keys.slice().sort());
+  };
+  switch (Object.prototype.toString.call(x)) {
+    case '[object Arguments]':
+      return '(function() { return arguments; }(' + _map(recur, x).join(', ') + '))';
+    case '[object Array]':
+      return '[' + _map(recur, x).concat(mapPairs(x, reject(function (k) {
+        return /^\d+$/.test(k);
+      }, keys(x)))).join(', ') + ']';
+    case '[object Boolean]':
+      return typeof x === 'object' ? 'new Boolean(' + recur(x.valueOf()) + ')' : x.toString();
+    case '[object Date]':
+      return 'new Date(' + (isNaN(x.valueOf()) ? recur(NaN) : _quote(_toISOString(x))) + ')';
+    case '[object Null]':
+      return 'null';
+    case '[object Number]':
+      return typeof x === 'object' ? 'new Number(' + recur(x.valueOf()) + ')' : 1 / x === -Infinity ? '-0' : x.toString(10);
+    case '[object String]':
+      return typeof x === 'object' ? 'new String(' + recur(x.valueOf()) + ')' : _quote(x);
+    case '[object Undefined]':
+      return 'undefined';
+    default:
+      if (typeof x.toString === 'function') {
+        var repr = x.toString();
+        if (repr !== '[object Object]') {
+          return repr;
+        }
+      }
+      return '{' + mapPairs(x, keys(x)).join(', ') + '}';
+  }
+};
+
+function toString(val) {
+  return _toString(val, []);
+}
+
+function concat(a, b) {
+  if (_isArray(a)) {
+    if (_isArray(b)) {
+      return a.concat(b);
+    }
+    throw new TypeError(toString(b) + ' is not an array');
+  }
+  if (_isString(a)) {
+    if (_isString(b)) {
+      return a + b;
+    }
+    throw new TypeError(toString(b) + ' is not a string');
+  }
+  if (a != null && _isFunction(a['fantasy-land/concat'])) {
+    return a['fantasy-land/concat'](b);
+  }
+  if (a != null && _isFunction(a.concat)) {
+    return a.concat(b);
+  }
+  throw new TypeError(toString(a) + ' does not have a method named "concat" or "fantasy-land/concat"');
+}
+
+var $bimap = 'fantasy-land/bimap';
+var $chain = 'fantasy-land/chain';
+var $map = 'fantasy-land/map';
+var $ap = 'fantasy-land/ap';
+
+var bimap = function (lmapper, rmapper, m) { return m[$bimap](lmapper, rmapper); };
+
+var chain = function (chainer, m) { return m[$chain](chainer); };
+
+var map = function (mapper, m) { return m[$map](mapper); };
+
+var ap = function (values, func) { return func[$ap](values); };
+
+var concatLeft = function(other){
+  return other.isLeft ? new Left(concat(this.value, other.value)) : other
+};
+
+var mapLeft = function(f){
+  return this
+};
+
+var bimapLeft = function(f, g){
+  return new Left(f(this.value));
+};
+
+var chainLeft = function(f){
+  return this
+};
+
+var altLeft = function(other){
+  return other
+};
+
+var reduceLeft = function (f, x) {
+  return x
+};
+
+var traverseLeft =  function(typeRep, f){
+  var this$1 = this;
+
+  return typeRep === Array 
+              ? [this] 
+              : typeRep === Function
+                ? function (x) { return this$1; }
+                : typeRep['fantasy-land/of'](this)
+};
+
+var extendLeft = function(f){
+  return this
+};
+
+var eitherLeft =  function(l, r){
+  return l(this.value)
+};
+
+function Left(x){
+  this.value = x;
+  this.isRight = false;
+  this.isLeft = true;
+  if(isSemiGroup(x)){
+    this['fantasy-land/concat'] = concatLeft;
+    this.concat = concatLeft;
+  }
+}
+
+Left.prototype = Object.create(Maybe.prototype);
+
+Left.prototype.map = mapLeft;
+
+Left.prototype['fantasy-land/map'] = mapLeft;
+
+Left.prototype['fantasy-land/bimap'] = bimapLeft;
+
+Left.prototype.bimap = bimapLeft;
+
+Left.prototype.chain = chainLeft;
+
+Left.prototype['fantasy-land/chain'] = chainLeft;
+
+Left.prototype.alt = altLeft;
+
+Left.prototype['fantasy-land/alt'] = altLeft;
+
+Left.prototype.reduce = reduceLeft;
+
+Left.prototype['fantasy-land/reduce'] = reduceLeft;
+
+Left.prototype.traverse = traverseLeft;
+
+Left.prototype['fantasy-land/traverse'] = traverseLeft;
+
+Left.prototype.extend = extendLeft;
+
+Left.prototype['fantasy-land/extend'] = extendLeft;
+
+Left.prototype.either = eitherLeft;
+
+Left.prototype.toString = function(){
+  return ("Left(" + (toString(this.value)) + ")")
+};
+
+//v8 optimization
+toFastProperties(Left);
+toFastProperties(Left.prototype);
+
+var concatRight = function(other){
+  return other.isLeft ? this : new Right(concat(this.value, other.value))
+};
+
+var mapRight = function(f){
+  return new Right(f(this.value))
+};
+
+var bimapRight = function(f, g){
+  return new Right(g(this.value));
+};
+
+var chainRight = function(f){
+  return f(this.value)
+};
+
+var altRight = function(other){
+  return this
+};
+
+var reduceRight = function (f, x) {
+  return f(x, this.value)
+};
+
+var traverseRight = function(typeRep, f){
+  return new Right(f(this.value))
+};
+var extendRight = function(f){
+  return new Right(f(this));
+};
+
+var eitherRight =  function(l, r){
+  return r(this.value)
+};
+
+function Right(x){
+  this.value = x;
+  this.isLeft = false;
+  this.isRight = true;
+  if(isSemiGroup(x)){
+    this['fantasy-land/concat'] = concatRight;
+    this.concat = concatRight;
+  }
+}
+
+Right.prototype = Object.create(Maybe.prototype);
+
+Right.prototype.map = mapRight;
+
+Right.prototype['fantasy-land/map'] = mapRight;
+
+Right.prototype['fantasy-land/bimap'] = bimapRight;
+
+Right.prototype.bimap = bimapRight;
+
+Right.prototype.chain = chainRight;
+
+Right.prototype['fantasy-land/chain'] = chainRight;
+
+Right.prototype.alt = altRight;
+
+Right.prototype['fantasy-land/alt'] = altRight;
+
+Right.prototype.reduce = reduceRight;
+
+Right.prototype['fantasy-land/reduce'] = reduceRight;
+
+Right.prototype.traverse = traverseRight;
+
+Right.prototype['fantasy-land/traverse'] = traverseRight;
+
+Right.prototype.extend = extendRight;
+
+Right.prototype['fantasy-land/extend'] = extendRight;
+
+Right.prototype.either = eitherRight;
+
+Right.prototype.toString = function(){
+  return ("Right(" + (toString(this.value)) + ")")
+};
+
+//v8 optimization
+toFastProperties(Right);
+toFastProperties(Right.prototype);
+
+var isSemiGroup$1 = function (x) { return isFunction(x.concat) ||  isFunction(x['fantasy-land/concat']); }; 
+
+var concatJust = function(other){
+  return other.isNothing ? this : new Just$1(concat(this.value, other.value))
+};
+
+var equalJust = function(other){
+  return other.isJust && equals(this.value, other.value)
+};
+var lteJust = function(other){
+  return other.isJust && (this.value <= other.value)
+};
+
+var mapJust = function(f){
+  return new Just$1(f(this.value))
+};
+
+var apJust = function(other){
+  return other.isJust ? this.map(other.value) : other
+};
+
+var chainJust = function(f){
+  return f(this.value)
+};
+
+var altJust = function(other){
+  return this
+};
+
+var reduceJust = function(f, x){
+  return f(x, this.value)
+};
+
+var traverseJust = function(typeRep, f){
+  return new Just$1(f(this.value))
+};
+
+var extendJust = function(f){
+  return new Just$1(f(this))
+};
+
+function Just$1(x){
+  this.value = x;
+  this.isNothing = false;
+  this.isJust = true;
+  if(isSemiGroup$1(x)){
+    this['fantasy-land/concat'] = concatJust;
+    this.concat = concatJust;
+  }
+}
+
+Just$1.prototype = Object.create(Maybe$1.prototype);
+
+Just$1.prototype.equals = equalJust;
+
+Just$1.prototype['fantasy-land/equals'] = equalJust;
+
+Just$1.prototype.lte = lteJust;
+
+Just$1.prototype['fantasy-land/lte'] = lteJust;
+
+Just$1.prototype.map = mapJust;
+
+Just$1.prototype['fantasy-land/map'] = mapJust;
+
+Just$1.prototype.ap = apJust;
+
+Just$1.prototype['fantasy-land/ap'] = apJust;
+
+Just$1.prototype.chain = chainJust;
+
+Just$1.prototype['fantasy-land/chain'] = chainJust;
+
+Just$1.prototype.alt = altJust;
+
+Just$1.prototype['fantasy-land/alt'] = altJust;
+
+Just$1.prototype.reduce = reduceJust;
+
+Just$1.prototype['fantasy-land/reduce'] = reduceJust;
+
+Just$1.prototype.traverse = traverseJust;
+
+Just$1.prototype['fantasy-land/traverse'] = traverseJust;
+
+Just$1.prototype.extend = extendJust;
+
+Just$1.prototype['fantasy-land/extend'] = extendJust;
+
+Just$1.prototype.getOrElse = function(x){
+  return this.value
+};
+
+Just$1.prototype.toString = function(){
+  return ("Just(" + (toString(this.value)) + ")")
+};
+
+//v8 optimization
+toFastProperties(Just$1);
+toFastProperties(Just$1.prototype);
+
+var concatNothing = function(other){
+  return other
+};
+
+var equalNothing = function(other){
+  return other.isNothing
+};
+
+var lteNothing = function(other){
+  return true
+};
+
+var mapNothing = function(f){
+  return this
+};
+
+var apNothing = function(other){
+  return this
+};
+
+var chainNothing = function(f){
+  return this
+};
+
+var altNothing = function(other){
+  return other
+};
+
+var reduceNothing = function(f, x){
+  return x
+};
+
+var traverseNothing = function(typeRep, f){
+  var this$1 = this;
+
+  return typeRep === Array 
+              ? [this] 
+              : typeRep === Function
+                ? function (x) { return this$1; }
+                : typeRep['fantasy-land/of'](this)
+};
+
+var extendNothing = function(f){
+  return this
+};
+
+function Nothing$1(){
+  this.isNothing = true;
+  this.isJust = false;
+  this['fantasy-land/concat'] = concatNothing;
+  this.concat = concatNothing;
+}
+
+Nothing$1.prototype = Object.create(Maybe$1.prototype);
+
+Nothing$1.prototype.equals = equalNothing;
+
+Nothing$1.prototype['fantasy-land/equals'] = equalNothing;
+
+Nothing$1.prototype.lte = lteNothing;
+
+Nothing$1.prototype['fantasy-land/lte'] = lteNothing;
+
+Nothing$1.prototype.map = mapNothing;
+
+Nothing$1.prototype['fantasy-land/map'] = mapNothing;
+
+Nothing$1.prototype.ap = apNothing;
+
+Nothing$1.prototype['fantasy-land/ap'] = apNothing;
+
+Nothing$1.prototype.chain = chainNothing;
+
+Nothing$1.prototype['fantasy-land/chain'] = chainNothing;
+
+Nothing$1.prototype.alt = altNothing;
+
+Nothing$1.prototype['fantasy-land/alt'] = altNothing;
+
+Nothing$1.prototype.reduce = reduceNothing;
+
+Nothing$1.prototype['fantasy-land/reduce'] = reduceNothing;
+
+Nothing$1.prototype.traverse = traverseNothing;
+
+Nothing$1.prototype['fantasy-land/traverse'] = traverseNothing;
+
+Nothing$1.prototype.extend = extendNothing;
+
+Nothing$1.prototype['fantasy-land/extend'] = extendNothing;
+
+Nothing$1.prototype.getOrElse = function(x){
+  return x
+};
+
+Nothing$1.prototype.toString = function(){
+  return "Nothing"
+};
+
+//v8 optimization
+toFastProperties(Nothing$1);
+toFastProperties(Nothing$1.prototype);
+
+//these are just util curry functions for the use of the library.
+//they are built for performance and dont have the same functinality as ramda
+function c2(){
+  var this$1 = this;
+  var args = [], len = arguments.length;
+  while ( len-- ) args[ len ] = arguments[ len ];
+
+  var fresh = [];
+  var i = 0;
+  var j = this.params.length;
+  var total = j + args.length;
+  while(i < total){
+    if(i < j) { fresh.push(this$1.params[i]); }
+    else { fresh.push(args[i - j]); }
+    i = i + 1;
+  }
+  switch(fresh.length){
+    case 1: return function (x) { return this$1.f(fresh[0], x); }
+    case 2: return this.f(fresh[0], fresh[1]);
+    default: return c2.bind({f:this.f, params:fresh}) 
+  }
+}
+
+function c3(){
+  var this$1 = this;
+  var args = [], len = arguments.length;
+  while ( len-- ) args[ len ] = arguments[ len ];
+
+  var fresh = [];
+  var i = 0;
+  var j = this.params.length;
+  var total = j + args.length;
+  while(i < total){
+    if(i < j) { fresh.push(this$1.params[i]); }
+    else { fresh.push(args[i - j]); }
+    i = i + 1;
+  }
+  switch(fresh.length){
+    case 2: return function (x) { return this$1.f(fresh[0], fresh[1], x); }
+    case 3: return this.f(fresh[0], fresh[1], fresh[2]);
+    default: return c3.bind({f:this.f, params:fresh}) 
+  }
+}
+
+function cN(){
+  var this$1 = this;
+  var args = [], len = arguments.length;
+  while ( len-- ) args[ len ] = arguments[ len ];
+
+  var fresh = [];
+  var i = 0;
+  var j = this.params.length;
+  var total = j + args.length;
+  while(i < total){
+    if(i < j) { fresh.push(this$1.params[i]); }
+    else { fresh.push(args[i - j]); }
+    i = i + 1;
+  }
+  switch(fresh.length){
+    case this.size - 1: return function (x) { return (ref = this$1).f.apply(ref, fresh.concat( [x] ))
+      var ref; };
+    case this.size: return (ref = this).f.apply(ref, fresh);
+    default: return cN.bind({f:this.f, params:fresh, size:this.size}) 
+  }
+  var ref;
+}
+
+function curryN(n,f){
+  var meta = {
+    f:f,
+    params: [],
+    size:n
+  };
+  switch(n){
+    case 2: return c2.bind(meta);
+    case 3: return c3.bind(meta);
+    default: return cN.bind(meta);
+  } 
+}
+
+var Left$1 = Either.Left;
+var Right$1 = Either.Right;
+
+var maybe_type = 'brisk-control/Maybe';
+
+function Maybe$1(){}
+
+Maybe$1.prototype.inspect = function() { 
+  return this.toString(); 
+};
+
+Maybe$1['@@type'] = maybe_type;
+
+var nothing = new Nothing$1();
+
+Maybe$1.Nothing = nothing;
+
+Maybe$1.Just = function(x){
+  return new Just$1(x)
+};
+
+Maybe$1['fantasy-land/of'] = function(x){
+  return new Just$1(x)
+};
+
+Maybe$1.of = function(x){
+  return new Just$1(x)
+};
+
+var returnNothing = function(){
+  return nothing
+};
+
+Maybe$1['fantasy-land/empty'] = returnNothing; 
+
+Maybe$1.empty = returnNothing; 
+
+Maybe$1['fantasy-land/zero'] = returnNothing;
+
+Maybe$1.zero = returnNothing;
+
+Maybe$1.isJust = function(maybe){
+  return maybe.isJust
+};
+
+Maybe$1.fromMaybe = function(x, maybe) {
+  if (arguments.length === 1) { return function (maybe) { return maybe.isJust ? maybe.value : x; }; }
+  return maybe.isJust ? maybe.value : x;
+};
+
+Maybe$1.maybeToNullable = function(maybe){
+  return maybe.isJust ? maybe.value : null
+};
+
+Maybe$1.toMaybe = function(x){
+  return x == null ? nothing : new Just$1(x);
+};
+
+Maybe$1.maybe = function (x, f, maybe) {
+  if (arguments.length === 1) { return curryN(2, function (f, maybe) { return Maybe$1.fromMaybe(x, maybe.map(f)); }); }
+  if (arguments.length === 2) { return function (maybe) { return Maybe$1.fromMaybe(x, maybe.map(f)); }; }
+  return Maybe$1.fromMaybe(x, maybe.map(f));
+};
+
+Maybe$1.maybeToEither = function(x, maybe){
+  if (arguments.length === 1) { return function (maybe) { return maybe.isNothing ? Left$1(x) : Right$1(maybe.value); }; }
+  return maybe.isNothing ? Left$1(x) : Right$1(maybe.value);
+};
+//encase justs
+//v8 optimization
+toFastProperties(Maybe$1);
+toFastProperties(Maybe$1.prototype);
+
+var Just = Maybe$1.Just;
+var Nothing = Maybe$1.Nothing;
+
+var either_type = 'brisk-control/Either';
+
+var equalEither = function(other){
+  return this.isLeft === other.isLeft && equals(this.value, other.value);
+};
+
+var lteEither = function (other) {
+  return this.isLeft === other.isLeft ?
+    this.value <= other.value :
+    this.isLeft;
+};
+
+var apEither = function(other){
+  return other.isRight ? this.map(other.value) : other;
+};
+
+function Either(){}
+
+Either.prototype.inspect = function() { 
+  return this.toString(); 
+};
+
+Either.prototype.equals = equalEither;
+
+Either.prototype['fantasy-land/equals'] = equalEither;
+
+Either.prototype.lte = lteEither;
+
+Either.prototype['fantasy-land/lte'] = lteEither;
+
+Either.prototype.ap = apEither;
+
+Either.prototype['fantasy-land/ap'] = apEither;
+
+Either['@@type'] = either_type;
+
+Either.isLeft = function(either){
+  return either.isLeft
+};
+
+Either.isRight = function(either){
+  return either.isRight
+};
+
+
+Either.fromEither = function(x, either) {
+  if (arguments.length === 1) { return function (either) { return either.isRight ? either.value : x; }; }
+  return either.isRight ? either.value : x;
+};
+
+Either.toEither = function(x, y){
+  return y == null ? new Left(x) : new Right(y);
+};
+
+Either.either = function (l, r, either) {
+  if (arguments.length === 1) { return curryN(2, function (r, either) { return either.isLeft ? l(either.value) : r(either.value); }); }
+  if (arguments.length === 2) { return function (either) { return either.isLeft ? l(either.value) : r(either.value); }; }
+  return either.isLeft ? l(either.value) : r(either.value);
+};
+Either.tagBy = function(pred, a){
+  if (arguments.length === 1) { return function (a) { return pred(a) ? new Right(a) : new Left(a); }; }
+  return pred(a) ? new Right(a) : new Left(a);
+};
+
+Either.Left = function(value){
+  return new Left(value)
+};
+
+Either.Right = function(value){
+  return new Right(value)
+};
+
+Either['fantasy-land/of'] = function(value){
+  return new Right(value)
+};
+
+Either.of = function(value){
+  return new Right(value)
+};
+
+Either.eitherToMaybe = function(either){
+  return either.isLeft ? Nothing : Just(either.value);
+};
+
+// look into lefts rights encase
+//v8 optimization
+toFastProperties(Either);
+toFastProperties(Either.prototype);
 
 function checkn(n) {
     if(typeof n !== 'number') {
@@ -82,226 +1367,6 @@ var showFunction = function (f) { return startPosPad('  ', inspectf(2, f)); };
 
 var emptyFn = function emptyFn() { };
 
-
-
-var baseMap = function (f) {
-  return f(this.value);
-};
-
-var getEquals = function (constructor) {
-  return function equals$$1(that) {
-    return that instanceof constructor && ramda.equals(this.value, that.value);
-  };
-};
-
-var extend = function (Child, Parent) {
-  function Ctor() {
-    this.constructor = Child;
-  }
-  Ctor.prototype = Parent.prototype;
-  Child.prototype = new Ctor();
-  Child.super_ = Parent.prototype;
-};
-
-var identity$1 = function (x) { return x; };
-
-
-
-
-
-var returnThis = function () { return this; };
-
-var chainRecNext = function (v) {
-  return { isNext: true, value: v };
-};
-
-var chainRecDone = function (v) {
-  return { isNext: false, value: v };
-};
-
-var deriveAp = function (Type) {
-  return function (fa) {
-    return this.chain(function (f) {
-      return fa.chain(function (a) {
-        return Type.of(f(a));
-      });
-    });
-  };
-};
-
-var deriveMap = function (Type) {
-  return function (f) {
-    return this.chain(function (a) {
-      return Type.of(f(a));
-    });
-  };
-};
-
-var fastProto = null;
-//%HasFastProperties
-// --allow-natives-syntax to check whether an object has fast properties.
-function FastObject(o) {
-	if (fastProto !== null && typeof fastProto.property) {
-		var result = fastProto;
-		fastProto = FastObject.prototype = null;
-		return result;
-	}
-	fastProto = FastObject.prototype = o == null ? Object.create(null) : o;
-	return new FastObject;
-}
-
-// Initialize the inline property cache of FastObject
-FastObject();
-
-function toFastProperties(o) {
-	return FastObject(o);
-}
-
-function Either(left, right) {
-  switch (arguments.length) {
-    case 0:
-      throw new TypeError('no arguments to Either');
-    case 1:
-      return function(right) {
-        return right == null ? Either.Left(left) : Either.Right(right);
-      };
-    default:
-      return right == null ? Either.Left(left) : Either.Right(right);
-  }
-}
-
-Either.prototype['@@type'] = 'ramda-fantasy/Either';
-
-Either.prototype.map = returnThis;
-
-Either.of = Either.prototype.of = function(value) {
-  return Either.Right(value);
-};
-
-Either.prototype.chain = returnThis; // throw?
-
-Either.either = ramda.curry(function either(leftFn, rightFn, e) {
-  if (e instanceof _Left) {
-    return leftFn(e.value);
-  } else if (e instanceof _Right) {
-    return rightFn(e.value);
-  } else {
-    throw new TypeError('invalid type given to Either.either');
-  }
-});
-
-Either.isLeft = function(x) {
-  return x.isLeft;
-};
-
-Either.isRight = function(x) {
-  return x.isRight;
-};
-
-
-// Right
-function _Right(x) {
-  this.value = x;
-}
-extend(_Right, Either);
-
-_Right.prototype.isRight = true;
-_Right.prototype.isLeft = false;
-
-_Right.prototype.map = function(fn) {
-  return new _Right(fn(this.value));
-};
-
-_Right.prototype.ap = function(that) {
-  return that.map(this.value);
-};
-
-_Right.prototype.chain = function(f) {
-  return f(this.value);
-};
-
-//chainRec
-Either.chainRec = Either.prototype.chainRec = function(f, i) {
-  var res, state = chainRecNext(i);
-  while (state.isNext) {
-    res = f(chainRecNext, chainRecDone, state.value);
-    if (Either.isLeft(res)) {
-      return res;
-    }
-    state = res.value;
-  }
-  return Either.Right(state.value);
-};
-
-_Right.prototype.bimap = function(_, f) {
-  return new _Right(f(this.value));
-};
-
-_Right.prototype.extend = function(f) {
-  return new _Right(f(this));
-};
-
-_Right.prototype.toString = function() {
-  return 'Either.Right(' + ramda.toString(this.value) + ')';
-};
-
-_Right.prototype.equals = getEquals(_Right);
-
-Either.Right = function(value) {
-  return new _Right(value);
-};
-
-
-// Left
-function _Left(x) {
-  this.value = x;
-}
-extend(_Left, Either);
-
-_Left.prototype.isLeft = true;
-_Left.prototype.isRight = false;
-
-_Left.prototype.ap = returnThis;
-
-_Left.prototype.bimap = function(f) {
-  return new _Left(f(this.value));
-};
-
-_Left.prototype.extend = returnThis;
-
-_Left.prototype.toString = function() {
-  return 'Either.Left(' + ramda.toString(this.value) + ')';
-};
-
-_Left.prototype.equals = getEquals(_Left);
-
-Either.Left = function(value) {
-  return new _Left(value);
-};
-
-
-// either
-Either.prototype.either = function instanceEither(leftFn, rightFn) {
-  return this.isLeft ? leftFn(this.value) : rightFn(this.value);
-};
-
-//v8 optimization
-toFastProperties(Either);
-toFastProperties(Either.prototype);
-
-var $bimap = 'fantasy-land/bimap';
-var $chain = 'fantasy-land/chain';
-var $map = 'fantasy-land/map';
-var $ap = 'fantasy-land/ap';
-
-var bimap = function (lmapper, rmapper, m) { return m[$bimap](lmapper, rmapper); };
-
-var chain = function (chainer, m) { return m[$chain](chainer); };
-
-var map = function (mapper, m) { return m[$map](mapper); };
-
-var ap = function (values, func) { return func[$ap](values); };
-
 function BaseAction(computation){
   this._computation = computation;
 }
@@ -353,7 +1418,7 @@ Identity.prototype._exec = function(rej, res) {
 };
 
 Identity.prototype.toString = function(){
-  return ("Action.of(" + (ramda.toString(this._value)) + ")");
+  return ("Action.of(" + (toString(this._value)) + ")");
 };
 
 //v8 optimization
@@ -530,7 +1595,7 @@ ActionReject.prototype._exec = function(rej) {
 };
 
 (ActionReject.prototype).toString = function() {
-  return ("Action.reject(" + (ramda.toString(this._reason)) + ")");
+  return ("Action.reject(" + (toString(this._reason)) + ")");
 };
 
 //v8 optimization
@@ -554,7 +1619,7 @@ ActionRejectAfter.prototype._exec = function(rej) {
 };
 
 (ActionRejectAfter.prototype).toString = function() {
-  return ("Action.rejectAfter(" + (ramda.toString(this._time)) + ", " + (ramda.toString(this._reason)) + ")");
+  return ("Action.rejectAfter(" + (toString(this._time)) + ", " + (toString(this._reason)) + ")");
 };
 
 //v8 optimization
@@ -578,7 +1643,7 @@ ActionAfter.prototype._exec = function(rej, res) {
 };
 
 (ActionAfter.prototype).toString = function() {
-  return ("Action.after(" + (ramda.toString(this._time)) + ", " + (ramda.toString(this._value)) + ")");
+  return ("Action.after(" + (toString(this._time)) + ", " + (toString(this._value)) + ")");
 };
 
 //v8 optimization
@@ -639,7 +1704,7 @@ ActionParallel.prototype._exec = function(rej, res) {
 };
 
 (ActionParallel.prototype).toString = function() {
-  return ("Action.parallel(" + (ramda.toString(this._max)) + ", [" + (this._actions.map(showFunction).join(', ')) + "])");
+  return ("Action.parallel(" + (toString(this._max)) + ", [" + (this._actions.map(showFunction).join(', ')) + "])");
 };
 
 //v8 optimization
@@ -968,7 +2033,7 @@ ActionTry.prototype._exec = function(rej, res) {
 };
 
 (ActionTry.prototype).toString = function() {
-  return ("Action.try(" + (ramda.toString(this._fn)) + ")");
+  return ("Action.try(" + (toString(this._fn)) + ")");
 };
 
 //v8 optimization
@@ -1019,7 +2084,7 @@ ChainRec.prototype._exec = function(rej, res) {
 };
 
 (ChainRec.prototype).toString = function ChainRec$toString(){
-  return ("Action.chainRec(" + (showFunction(this._iterate)) + ", " + (ramda.toString(this._init)) + ")");
+  return ("Action.chainRec(" + (showFunction(this._iterate)) + ", " + (toString(this._init)) + ")");
 };
 
 //v8 optimization
@@ -1191,7 +2256,7 @@ ActionWrap.prototype = Object.create(Action.prototype);
 (ActionWrap.prototype).toString = function() {
   var args = [this._a, this._b, this._c].slice(0, this._length).map(showFunction).join(', ');
   var name = "wrap" + (this._length > 1 ? this._length : '');
-  return ("Action." + name + "(" + (ramda.toString(this._fn)) + ", " + args + ")");
+  return ("Action." + name + "(" + (toString(this._fn)) + ", " + args + ")");
 };
 
 //v8 optimization
@@ -1230,7 +2295,7 @@ ActionFromPromise.prototype = Object.create(Action.prototype);
 ActionFromPromise.prototype.toString = function(){
   var args = [this._a, this._b, this._c].slice(0, this._length).map(showFunction).join(', ');
   var name = "fromPromise" + (this._length > 1 ? this._length : '');
-  return ("Action." + name + "(" + (ramda.toString(this._fn)) + ", " + args + ")");
+  return ("Action." + name + "(" + (toString(this._fn)) + ", " + args + ")");
 };
 
 //v8 optimization
@@ -1264,7 +2329,7 @@ toFastProperties(ActionNode.prototype);
 
 var $$type = '@@type';
 
-  function type(x) {
+  function type$1(x) {
     return x != null &&
            x.constructor != null &&
            x.constructor.prototype !== x &&
@@ -1272,86 +2337,6 @@ var $$type = '@@type';
       x.constructor[$$type] :
       Object.prototype.toString.call(x).slice('[object '.length, -']'.length);
   }
-
-//these are just util curry functions for the use of the library.
-//they are built for performance and dont have the same functinality as ramda
-function c2(){
-  var this$1 = this;
-  var args = [], len = arguments.length;
-  while ( len-- ) args[ len ] = arguments[ len ];
-
-  var fresh = [];
-  var i = 0;
-  var j = this.params.length;
-  var total = j + args.length;
-  while(i < total){
-    if(i < j) { fresh.push(this$1.params[i]); }
-    else { fresh.push(args[i - j]); }
-    i = i + 1;
-  }
-  switch(fresh.length){
-    case 1: return function (x) { return this$1.f(fresh[0], x); }
-    case 2: return this.f(fresh[0], fresh[1]);
-    default: return c2.bind({f:this.f, params:fresh}) 
-  }
-}
-
-function c3(){
-  var this$1 = this;
-  var args = [], len = arguments.length;
-  while ( len-- ) args[ len ] = arguments[ len ];
-
-  var fresh = [];
-  var i = 0;
-  var j = this.params.length;
-  var total = j + args.length;
-  while(i < total){
-    if(i < j) { fresh.push(this$1.params[i]); }
-    else { fresh.push(args[i - j]); }
-    i = i + 1;
-  }
-  switch(fresh.length){
-    case 2: return function (x) { return this$1.f(fresh[0], fresh[1], x); }
-    case 3: return this.f(fresh[0], fresh[1], fresh[2]);
-    default: return c3.bind({f:this.f, params:fresh}) 
-  }
-}
-
-function cN(){
-  var this$1 = this;
-  var args = [], len = arguments.length;
-  while ( len-- ) args[ len ] = arguments[ len ];
-
-  var fresh = [];
-  var i = 0;
-  var j = this.params.length;
-  var total = j + args.length;
-  while(i < total){
-    if(i < j) { fresh.push(this$1.params[i]); }
-    else { fresh.push(args[i - j]); }
-    i = i + 1;
-  }
-  switch(fresh.length){
-    case this.size - 1: return function (x) { return (ref = this$1).f.apply(ref, fresh.concat( [x] ))
-      var ref; };
-    case this.size: return (ref = this).f.apply(ref, fresh);
-    default: return cN.bind({f:this.f, params:fresh, size:this.size}) 
-  }
-  var ref;
-}
-
-function curryN(n,f){
-  var meta = {
-    f:f,
-    params: [],
-    size:n
-  };
-  switch(n){
-    case 2: return c2.bind(meta);
-    case 3: return c3.bind(meta);
-    default: return cN.bind(meta);
-  } 
-}
 
 var $alt = 'fantasy-land/alt';
   var $ap$1 = 'fantasy-land/ap';
@@ -1400,8 +2385,8 @@ var $alt = 'fantasy-land/alt';
 
   }
 
-var action_type = 'BriskSale/Action';
-var verifyAction = function (m) { return m instanceof Action || type(m) === action_type; };
+var action_type = 'brisk-control/Action';
+var verifyAction = function (m) { return m instanceof Action || type$1(m) === action_type; };
 
 
 function Action(f){
@@ -1487,7 +2472,7 @@ Action.prototype.fork = exec;
 Action.prototype.value = function(f) {
   return this._exec(function(e) {
     throw new Error(
-      ("ActionInst.value was called on a rejected Action\n  Actual: Action.reject(" + (ramda.toString(e)) + ")")
+      ("ActionInst.value was called on a rejected Action\n  Actual: Action.reject(" + (toString(e)) + ")")
     );
   }, f);
 };
@@ -1716,321 +2701,188 @@ toFastProperties(Action.prototype);
 
 Action.Action = Action;
 
-/**
- * A data type that holds a value and exposes a monadic api.
- */
-
-/**
- * Constructs a new `Identity[a]` data type that holds a single
- * value `a`.
- * @param {*} a Value of any type
- * @sig a -> Identity[a]
- */
-function Identity$1(x) {
-  if (!(this instanceof Identity$1)) {
-    return new Identity$1(x);
-  }
-  this.value = x;
+function BaseIO(computation){
+  this.computation = computation;
 }
 
-Identity$1.prototype['@@type'] = 'ramda-fantasy/Identity';
+BaseIO.prototype = Object.create(IO.prototype);
 
-/**
- * Applicative specification. Creates a new `Identity[a]` holding the value `a`.
- * @param {*} a Value of any type
- * @returns Identity[a]
- * @sig a -> Identity[a]
- */
-Identity$1.of = function(x) {
-  return new Identity$1(x);
-};
-Identity$1.prototype.of = Identity$1.of;
-
-/**
- * Functor specification. Creates a new `Identity[a]` mapping function `f` onto
- * `a` returning any value b.
- * @param {Function} f Maps `a` to any value `b`
- * @returns Identity[b]
- * @sig @Identity[a] => (a -> b) -> Identity[b]
- */
-Identity$1.prototype.map = function(f) {
-  return new Identity$1(f(this.value));
+BaseIO.prototype._runIO = function(){
+  return this.computation()
 };
 
-/**
- * Apply specification. Applies the function inside the `Identity[a]`
- * type to another applicative type.
- * @param {Applicative[a]} app Applicative that will apply its function
- * @returns Applicative[b]
- * @sig (Identity[a -> b], f: Applicative[_]) => f[a] -> f[b]
- */
-Identity$1.prototype.ap = function(app) {
-  return app.map(this.value);
+BaseIO.prototype.toString = function() {
+  return ("IO(" + (showFunction(this._computation)) + ")");
 };
-
-/**
- * Chain specification. Transforms the value of the `Identity[a]`
- * type using an unary function to monads. The `Identity[a]` type
- * should contain a function, otherwise an error is thrown.
- *
- * @param {Function} fn Transforms `a` into a `Monad[b]`
- * @returns Monad[b]
- * @sig (Identity[a], m: Monad[_]) => (a -> m[b]) -> m[b]
- */
-Identity$1.prototype.chain = function(fn) {
-  return fn(this.value);
-};
-
-// chainRec
-Identity$1.chainRec = Identity$1.prototype.chainRec = function(f, i) {
-  var state = chainRecNext(i);
-  while (state.isNext) {
-    state = f(chainRecNext, chainRecDone, state.value).get();
-  }
-  return Identity$1(state.value);
-};
-
-/**
- * Returns the value of `Identity[a]`
- *
- * @returns a
- * @sig (Identity[a]) => a
- */
-Identity$1.prototype.get = function() {
-  return this.value;
-};
-
-// equality method to enable testing
-Identity$1.prototype.equals = getEquals(Identity$1);
-
-Identity$1.prototype.toString = function() {
-  return 'Identity(' + ramda.toString(this.value) + ')';
-};
-
 
 //v8 optimization
-toFastProperties(Identity$1);
-toFastProperties(Identity$1.prototype);
+toFastProperties(BaseIO);
+toFastProperties(BaseIO.prototype);
 
-function IO(fn) {
-  if (!(this instanceof IO)) {
-    return new IO(fn);
-  }
-  this.fn = fn;
+function ChainIO(parent, chainer){
+  this._parent = parent;
+  this._chainer = chainer;
 }
 
-IO.prototype['@@type'] = 'ramda-fantasy/IO';
+ChainIO.prototype = Object.create(IO.prototype);
 
-// `f` must return an IO
-IO.prototype.chain = function(f) {
-  var io = this;
-  return new IO(function() {
-    var next = f(io.fn.apply(io, arguments));
-    return next.fn.apply(next, arguments);
-  });
+ChainIO.prototype._runIO = function(){
+  return this._chainer(this.parent._runIO())
 };
 
-//chainRec
-IO.chainRec = IO.prototype.chainRec = function(f, i) {
-  return new IO(function() {
-    var state = chainRecNext(i);
-    while (state.isNext) {
-      state = f(chainRecNext, chainRecDone, state.value).fn();
-    }
-    return state.value;
-  });
+ChainIO.prototype.toString = function() {
+  return ((this._parent.toString()) + ".chain(" + (showFunction(this._chainer)) + ")");
 };
 
-IO.prototype.map = function(f) {
-  var io = this;
-  return new IO(ramda.compose(f, io.fn));
+//v8 optimization
+toFastProperties(ChainIO);
+toFastProperties(ChainIO.prototype);
+
+var nextValue$1 = function (x) { return ({ done: false, value: x }); };
+var iterationDone$1 = function (x) { return ({ done: true, value: x }); };
+
+function ChainRecIO(iterate, init) {
+  this._iterate = iterate;
+  this._init = init;
+}
+
+ChainRecIO.prototype = Object.create(IO.prototype);
+
+ChainRecIO.prototype._runIO = function () {
+  var this$1 = this;
+
+  var state = nextValue$1(this._init);
+  while (state.done === false) {
+     state = this$1._iterate(nextValue$1, iterationDone$1, state.value);
+  }
+  return state.value
 };
 
-// `this` IO must wrap a function `f` that takes an IO (`thatIo`) as input
-// `f` must return an IO
-IO.prototype.ap = function(thatIo) {
-  return this.chain(function(f) {
-    return thatIo.map(f);
-  });
+ChainRecIO.prototype.toString = function () {
+  return  ("IO.chainRec(" + (showFunction(this._iterate)) + ", " + (toString(this._init)) + ")");
 };
 
-IO.runIO = function(io) {
-  return io.runIO.apply(io, [].slice.call(arguments, 1));
+//v8 optimization
+toFastProperties(ChainRecIO);
+toFastProperties(ChainRecIO.prototype);
+
+function IdentityIO(value){
+  this._value = value;
+}
+
+IdentityIO.prototype = Object.create(IO.prototype);
+
+IdentityIO.prototype._runIO = function(){
+  return this._value
+};
+
+IdentityIO.prototype.toString = function() {
+  return ("IO.of(" + (toString(this._value)) + ")");
+};
+
+//v8 optimization
+toFastProperties(IdentityIO);
+toFastProperties(IdentityIO.prototype);
+
+function ApplicativeIO(mval, mfunc){
+  this._mval = mval;
+  this._mfunc = mfunc;
+}
+
+ApplicativeIO.prototype = Object.create(IO.prototype);
+
+ApplicativeIO.prototype._runIO = function(){
+  var f = this._mval._runIO();
+  return f(this._mfunc._runIO())
+};
+
+ApplicativeIO.prototype.toString = function() {
+  return ((this._mval.toString()) + ".ap(" + (this._mfunc.toString()) + ")");
+};
+
+//v8 optimization
+toFastProperties(ApplicativeIO);
+toFastProperties(ApplicativeIO.prototype);
+
+function MapIO(parent, mapper){
+  this._parent = parent;
+  this._mapper = mapper;
+}
+
+MapIO.prototype = Object.create(IO.prototype);
+
+MapIO.prototype._runIO = function(){
+ 
+  return this._mapper(this._parent._runIO())
+};
+
+MapIO.prototype.toString = function() {
+  return ((this._parent.toString()) + ".map(" + (showFunction(this._mapper)) + ")");
+};
+
+//v8 optimization
+toFastProperties(MapIO);
+toFastProperties(MapIO.prototype);
+
+var io_type = 'brisk-control/IO';
+var of$1 = function (x) { return new IdentityIO(x); };
+
+function IO(computation){
+  return new BaseIO(computation)
+}
+
+IO.prototype.chain = function(f){
+  return new ChainIO(this, f)
+};
+
+IO.prototype.map = function(f){
+  return new MapIO(this, f)
+};
+
+IO.prototype.ap = function(m){
+  return new ApplicativeIO(this, m)
+};
+
+IO.prototype.run = function() {
+  return this._runIO()
 };
 
 IO.prototype.runIO = function() {
-  return this.fn.apply(this, arguments);
+  return this._runIO()
 };
 
-IO.prototype.run = IO.prototype.runIO;
+function ChainRec$1(f, init) {
+  if (arguments.length === 1) { return function (init) { return new ChainRecIO(f, init); }; }
+  return new ChainRecIO(f, init)
+}
 
-IO.prototype.of = function(x) {
-  return new IO(function() { return x; });
+IO.run = function(io){
+  return io.run()
 };
 
-IO.of = IO.prototype.of;
-
-IO.prototype.toString = function() {
-  return 'IO(' + ramda.toString(this.fn) + ')';
+IO.runIO = function(io){
+  return io.run()
 };
+
+IO.chainRec = ChainRec$1;
+
+IO.of = of$1;
+
+IO['fantasy-land/of'] = of$1;
+IO['fantasy-land/chainRec'] = ChainRec$1;
+IO.prototype['fantasy-land/ap'] = IO.prototype.ap;
+IO.prototype['fantasy-land/map'] = IO.prototype.map;
+IO.prototype['fantasy-land/chain'] = IO.prototype.chain;
+
+IO.IO = function(computation){
+  return new BaseIO(computation)
+};
+
+IO['@@type'] = io_type;
 
 //v8 optimization
 toFastProperties(IO);
 toFastProperties(IO.prototype);
-
-function Maybe(x) {
-  return x == null ? _nothing : Maybe.Just(x);
-}
-
-Maybe.prototype['@@type'] = 'ramda-fantasy/Maybe';
-
-function Just(x) {
-  this.value = x;
-}
-extend(Just, Maybe);
-
-Just.prototype.isJust = true;
-Just.prototype.isNothing = false;
-
-function Nothing() {}
-extend(Nothing, Maybe);
-
-Nothing.prototype.isNothing = true;
-Nothing.prototype.isJust = false;
-
-var _nothing = new Nothing();
-
-Maybe.Nothing = function() {
-  return _nothing;
-};
-
-Maybe.Just = function(x) {
-  return new Just(x);
-};
-
-Maybe.of = Maybe.Just;
-
-Maybe.prototype.of = Maybe.Just;
-
-Maybe.isJust = function(x) {
-  return x.isJust;
-};
-
-Maybe.isNothing = function(x) {
-  return x.isNothing;
-};
-
-Maybe.maybe = ramda.curry(function(nothingVal, justFn, m) {
-  return m.reduce(function(_, x) {
-    return justFn(x);
-  }, nothingVal);
-});
-
-Maybe.toMaybe = Maybe;
-
-// semigroup
-Just.prototype.concat = function(that) {
-  return that.isNothing ? this : this.of(
-    this.value.concat(that.value)
-  );
-};
-
-Nothing.prototype.concat = identity$1;
-
-// functor
-Just.prototype.map = function(f) {
-  return this.of(f(this.value));
-};
-
-Nothing.prototype.map = returnThis;
-
-// apply
-// takes a Maybe that wraps a function (`app`) and applies its `map`
-// method to this Maybe's value, which must be a function.
-Just.prototype.ap = function(m) {
-  return m.map(this.value);
-};
-
-Nothing.prototype.ap = returnThis;
-
-// applicative
-// `of` inherited from `Maybe`
-
-
-// chain
-//  f must be a function which returns a value
-//  f must return a value of the same Chain
-//  chain must return a value of the same Chain
-Just.prototype.chain = baseMap;
-
-Nothing.prototype.chain = returnThis;
-
-
-//chainRec
-Maybe.chainRec = Maybe.prototype.chainRec = function(f, i) {
-  var res, state = chainRecNext(i);
-  while (state.isNext) {
-    res = f(chainRecNext, chainRecDone, state.value);
-    if (Maybe.isNothing(res)) {
-      return res;
-    }
-    state = res.value;
-  }
-  return Maybe.Just(state.value);
-};
-
-
-//
-Just.prototype.datatype = Just;
-
-Nothing.prototype.datatype = Nothing;
-
-// monad
-// A value that implements the Monad specification must also implement the Applicative and Chain specifications.
-// see above.
-
-// equality method to enable testing
-Just.prototype.equals = getEquals(Just);
-
-Nothing.prototype.equals = function(that) {
-  return that === _nothing;
-};
-
-Maybe.prototype.isNothing = function() {
-  return this === _nothing;
-};
-
-Maybe.prototype.isJust = function() {
-  return this instanceof Just;
-};
-
-Just.prototype.getOrElse = function() {
-  return this.value;
-};
-
-Nothing.prototype.getOrElse = function(a) {
-  return a;
-};
-
-Just.prototype.reduce = function(f, x) {
-  return f(x, this.value);
-};
-
-Nothing.prototype.reduce = function(f, x) {
-  return x;
-};
-
-Just.prototype.toString = function() {
-  return 'Maybe.Just(' + ramda.toString(this.value) + ')';
-};
-
-Nothing.prototype.toString = function() {
-  return 'Maybe.Nothing()';
-};
-
-//v8 optimization
-toFastProperties(Maybe);
-toFastProperties(Maybe.prototype);
 
 function Reader(run) {
   if (!(this instanceof Reader)) {
@@ -2071,10 +2923,10 @@ Reader.prototype.of = function(a) {
 };
 Reader.of = Reader.prototype.of;
 
-Reader.ask = Reader(ramda.identity);
+Reader.ask = Reader(function (x){ return x; });
 
 Reader.prototype.toString = function() {
-  return 'Reader(' + ramda.toString(this.run) + ')';
+  return 'Reader(' + toString(this.run) + ')';
 };
 
 Reader.T = function(M) {
@@ -2085,7 +2937,7 @@ Reader.T = function(M) {
     this.run = run;
   };
 
-  ReaderT.lift = ramda.compose(ReaderT, ramda.always);
+  ReaderT.lift = function (x) { return ReaderT(function (_) { return x; }); };
 
   ReaderT.ask = ReaderT(M.of);
 
@@ -2119,7 +2971,7 @@ Reader.T = function(M) {
   };
 
   ReaderT.prototype.toString = function() {
-    return 'ReaderT[' + M.name + '](' + ramda.toString(this.run) + ')';
+    return 'ReaderT[' + M.name + '](' + toString(this.run) + ')';
   };
 
   return ReaderT;
@@ -2129,170 +2981,14 @@ Reader.T = function(M) {
 toFastProperties(Reader);
 toFastProperties(Reader.prototype);
 
-function Tuple(x, y) {
-  switch (arguments.length) {
-    case 0:
-      throw new TypeError('no arguments to Tuple');
-    case 1:
-      return function(y) {
-        return new _Tuple(x, y);
-      };
-    default:
-      return new _Tuple(x, y);
-  }
-}
-
-function _Tuple(x, y) {
-  this[0] = x;
-  this[1] = y;
-  this.length = 2;
-}
-
-function ensureConcat(xs) {
-  xs.forEach(function(x) {
-    if (typeof x.concat != 'function') {
-      throw new TypeError(ramda.toString(x) + ' must be a semigroup to perform this operation');
-    }
-  });
-}
-
-Tuple.fst = function(x) {
-  return x[0];
-};
-
-Tuple.snd = function(x) {
-  return x[1];
-};
-
-_Tuple.prototype['@@type'] = 'ramda-fantasy/Tuple';
-
-// semigroup
-_Tuple.prototype.concat = function(x) {
-  ensureConcat([this[0], this[1]]);
-  return Tuple(this[0].concat(x[0]), this[1].concat(x[1]));
-};
-
-// functor
-_Tuple.prototype.map = function(f) {
-  return Tuple(this[0], f(this[1]));
-};
-
-// apply
-_Tuple.prototype.ap = function(m) {
-  ensureConcat([this[0]]);
-  return Tuple(this[0].concat(m[0]), this[1](m[1]));
-};
-
-// setoid
-_Tuple.prototype.equals = function(that) {
-  return that instanceof _Tuple && ramda.equals(this[0], that[0]) && ramda.equals(this[1], that[1]);
-};
-
-_Tuple.prototype.toString = function() {
-  return 'Tuple(' + ramda.toString(this[0]) + ', ' + ramda.toString(this[1]) + ')';
-};
-
-function T(M) {
-  function StateT(run) {
-    if (!(this instanceof StateT)) {
-      return new StateT(run);
-    }
-    this._run = run;
-  }
-  StateT.prototype.run = function(s) {
-    return this._run(s);
-  };
-  StateT.prototype.eval = function(s) {
-    return Tuple.fst(this.run(s));
-  };
-  StateT.prototype.exec = function(s) {
-    return Tuple.snd(this.run(s));
-  };
-  StateT.prototype.chain = function(f) {
-    var state = this;
-    return StateT(function(s) {
-      return state._run(s).chain(function(t) {
-        return f(Tuple.fst(t))._run(Tuple.snd(t));
-      });
-    });
-  };
-  StateT.of = StateT.prototype.of = function(a) {
-    return StateT(function (s) {
-      return M.of(Tuple(a, s));
-    });
-  };
-  StateT.prototype.ap = deriveAp(StateT);
-  StateT.prototype.map = deriveMap(StateT);
-  StateT.tailRec = ramda.curry(function(stepFn, init) {
-    return StateT(function(s) {
-      return M.tailRec(function(t) {
-        return stepFn(Tuple.fst(t))._run(Tuple.snd(t)).chain(function (t_) {
-          return M.of(Tuple.fst(t_).bimap(
-            function(a) { return Tuple(a, Tuple.snd(t_)); },
-            function(b) { return Tuple(b, Tuple.snd(t_)); }
-          ));
-        });
-      }, Tuple(init, s));
-    });
-  });
-  StateT.lift = function(ma) {
-    return StateT(function(s) {
-      return ma.chain(function(a) {
-        return M.of(Tuple(a, s));
-      });
-    });
-  };
-  StateT.get = StateT(function(s) {
-    return M.of(Tuple(s, s));
-  });
-  StateT.gets = function(f) {
-    return StateT(function(s) {
-      return M.of(Tuple(f(s), s));
-    });
-  };
-  StateT.put = function(s) {
-    return StateT(function(_) {
-      return M.of(Tuple(void _, s));
-    });
-  };
-  StateT.modify = function(f) {
-    return StateT(function(s) {
-      return M.of(Tuple(void 0, f(s)));
-    });
-  };
-
-  return StateT;
-}
-var State = T(Identity$1);
-State.T = T;
-State.prototype.run = function(s) {
-  return this._run(s).value;
-};
-
 var index = {
   Either: Either,
   Action: Action,
-  Identity: Identity$1,
   IO: IO,
-  Maybe: Maybe,
+  Maybe: Maybe$1,
   Reader: Reader,
-  State: State,
-  Tuple: Tuple,
   Future:Action
 };
-// module.exports = {
-//   Action: require('./action/action'),
-//   Future: require('./action/action'),
-//   Identity: require('./Identity'),
-//   IO: require('./IO'),
-//   lift2: require('./lift2'),
-//   lift3: require('./lift3'),
-//   Maybe: require('./Maybe'),
-//   Reader: require('./Reader'),
-//   State: require('./State'),
-//   Tuple: require('./Tuple'),
-//   Futurize: require('futurize')
-// };
 
 return index;
 

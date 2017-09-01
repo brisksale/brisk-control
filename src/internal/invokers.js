@@ -1,5 +1,5 @@
 "use strict"
-export {toString} from "ramda";
+export {toString} from "./helper";
 const $bimap = 'fantasy-land/bimap';
 const $chain = 'fantasy-land/chain';
 const $map = 'fantasy-land/map';

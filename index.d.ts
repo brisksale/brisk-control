@@ -1,4 +1,5 @@
-declare module 'brisksale-algebraic-types' {
+//needs to be updated!!!!
+declare module 'brisk-control' {
   import { CurriedFunction2 } from 'ramda';
 
   interface Action<E, A>  {

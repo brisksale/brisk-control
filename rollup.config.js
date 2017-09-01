@@ -21,17 +21,15 @@ import buble from 'rollup-plugin-buble';
 
 const pkg = require('./package.json');
 
-const dependencies = {
-  'ramda': 'ramda'
-};
+// const dependencies = {
+//   'ramda': 'ramda'
+// };
 
 // export default {
 //   entry: 'src/index.js',
 //   plugins: [buble()],
-//   external: Object.keys(dependencies),
-//   globals: dependencies,
 //   format: 'umd',
-//   moduleName: 'brisksale-algebraic-types',
+//   moduleName: 'brisk-control',
 //   dest: 'dist/bundle.js'
 // };
 
@@ -42,9 +40,9 @@ export default {
       moduleDirectory: 'node_modules'
     }
   }), commonjs()],
-  external: Object.keys(dependencies),
-  globals: dependencies,
+  // external: Object.keys(dependencies),
+  // globals: dependencies,
   format: 'cjs',
-  moduleName: 'brisksale-algebraic-types',
+  moduleName: 'brisk-control',
   dest: 'index.js'
 };
