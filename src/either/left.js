@@ -4,6 +4,8 @@ import {toFastProperties} from '../internal/toFastProp';
 import {toString} from '../internal/invokers';
 import {has, isFunction, concat, equals} from '../internal/helper';
 
+const isSemiGroup = x => isFunction(x.concat) ||  isFunction(x['fantasy-land/concat']) 
+
 const concatLeft = function(other){
   return other.isLeft ? new Left(concat(this.value, other.value)) : other
 }
@@ -54,7 +56,7 @@ export function Left(x){
   }
 }
 
-Left.prototype = Object.create(Maybe.prototype);
+Left.prototype = Object.create(Either.prototype);
 
 Left.prototype.map = mapLeft
 

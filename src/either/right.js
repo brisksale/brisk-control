@@ -4,6 +4,8 @@ import {toFastProperties} from '../internal/toFastProp';
 import {toString} from '../internal/invokers';
 import {has, isFunction, concat, equals} from '../internal/helper';
 
+const isSemiGroup = x => isFunction(x.concat) ||  isFunction(x['fantasy-land/concat']) 
+
 const concatRight = function(other){
   return other.isLeft ? this : new Right(concat(this.value, other.value))
 }
@@ -49,7 +51,7 @@ export function Right(x){
   }
 }
 
-Right.prototype = Object.create(Maybe.prototype);
+Right.prototype = Object.create(Either.prototype);
 
 Right.prototype.map = mapRight
 

@@ -663,6 +663,8 @@ var map = function (mapper, m) { return m[$map](mapper); };
 
 var ap = function (values, func) { return func[$ap](values); };
 
+var isSemiGroup = function (x) { return isFunction(x.concat) ||  isFunction(x['fantasy-land/concat']); }; 
+
 var concatLeft = function(other){
   return other.isLeft ? new Left(concat(this.value, other.value)) : other
 };
@@ -715,7 +717,7 @@ function Left(x){
   }
 }
 
-Left.prototype = Object.create(Maybe.prototype);
+Left.prototype = Object.create(Either.prototype);
 
 Left.prototype.map = mapLeft;
 
@@ -754,6 +756,8 @@ Left.prototype.toString = function(){
 //v8 optimization
 toFastProperties(Left);
 toFastProperties(Left.prototype);
+
+var isSemiGroup$1 = function (x) { return isFunction(x.concat) ||  isFunction(x['fantasy-land/concat']); }; 
 
 var concatRight = function(other){
   return other.isLeft ? this : new Right(concat(this.value, other.value))
@@ -794,13 +798,13 @@ function Right(x){
   this.value = x;
   this.isLeft = false;
   this.isRight = true;
-  if(isSemiGroup(x)){
+  if(isSemiGroup$1(x)){
     this['fantasy-land/concat'] = concatRight;
     this.concat = concatRight;
   }
 }
 
-Right.prototype = Object.create(Maybe.prototype);
+Right.prototype = Object.create(Either.prototype);
 
 Right.prototype.map = mapRight;
 
@@ -840,7 +844,7 @@ Right.prototype.toString = function(){
 toFastProperties(Right);
 toFastProperties(Right.prototype);
 
-var isSemiGroup$1 = function (x) { return isFunction(x.concat) ||  isFunction(x['fantasy-land/concat']); }; 
+var isSemiGroup$2 = function (x) { return isFunction(x.concat) ||  isFunction(x['fantasy-land/concat']); }; 
 
 var concatJust = function(other){
   return other.isNothing ? this : new Just$1(concat(this.value, other.value))
@@ -885,13 +889,13 @@ function Just$1(x){
   this.value = x;
   this.isNothing = false;
   this.isJust = true;
-  if(isSemiGroup$1(x)){
+  if(isSemiGroup$2(x)){
     this['fantasy-land/concat'] = concatJust;
     this.concat = concatJust;
   }
 }
 
-Just$1.prototype = Object.create(Maybe$1.prototype);
+Just$1.prototype = Object.create(Maybe.prototype);
 
 Just$1.prototype.equals = equalJust;
 
@@ -994,7 +998,7 @@ function Nothing$1(){
   this.concat = concatNothing;
 }
 
-Nothing$1.prototype = Object.create(Maybe$1.prototype);
+Nothing$1.prototype = Object.create(Maybe.prototype);
 
 Nothing$1.prototype.equals = equalNothing;
 
@@ -1129,27 +1133,27 @@ var Right$1 = Either.Right;
 
 var maybe_type = 'brisk-control/Maybe';
 
-function Maybe$1(){}
+function Maybe(){}
 
-Maybe$1.prototype.inspect = function() { 
+Maybe.prototype.inspect = function() { 
   return this.toString(); 
 };
 
-Maybe$1['@@type'] = maybe_type;
+Maybe['@@type'] = maybe_type;
 
 var nothing = new Nothing$1();
 
-Maybe$1.Nothing = nothing;
+Maybe.Nothing = nothing;
 
-Maybe$1.Just = function(x){
+Maybe.Just = function(x){
   return new Just$1(x)
 };
 
-Maybe$1['fantasy-land/of'] = function(x){
+Maybe['fantasy-land/of'] = function(x){
   return new Just$1(x)
 };
 
-Maybe$1.of = function(x){
+Maybe.of = function(x){
   return new Just$1(x)
 };
 
@@ -1157,48 +1161,48 @@ var returnNothing = function(){
   return nothing
 };
 
-Maybe$1['fantasy-land/empty'] = returnNothing; 
+Maybe['fantasy-land/empty'] = returnNothing; 
 
-Maybe$1.empty = returnNothing; 
+Maybe.empty = returnNothing; 
 
-Maybe$1['fantasy-land/zero'] = returnNothing;
+Maybe['fantasy-land/zero'] = returnNothing;
 
-Maybe$1.zero = returnNothing;
+Maybe.zero = returnNothing;
 
-Maybe$1.isJust = function(maybe){
+Maybe.isJust = function(maybe){
   return maybe.isJust
 };
 
-Maybe$1.fromMaybe = function(x, maybe) {
+Maybe.fromMaybe = function(x, maybe) {
   if (arguments.length === 1) { return function (maybe) { return maybe.isJust ? maybe.value : x; }; }
   return maybe.isJust ? maybe.value : x;
 };
 
-Maybe$1.maybeToNullable = function(maybe){
+Maybe.maybeToNullable = function(maybe){
   return maybe.isJust ? maybe.value : null
 };
 
-Maybe$1.toMaybe = function(x){
+Maybe.toMaybe = function(x){
   return x == null ? nothing : new Just$1(x);
 };
 
-Maybe$1.maybe = function (x, f, maybe) {
-  if (arguments.length === 1) { return curryN(2, function (f, maybe) { return Maybe$1.fromMaybe(x, maybe.map(f)); }); }
-  if (arguments.length === 2) { return function (maybe) { return Maybe$1.fromMaybe(x, maybe.map(f)); }; }
-  return Maybe$1.fromMaybe(x, maybe.map(f));
+Maybe.maybe = function (x, f, maybe) {
+  if (arguments.length === 1) { return curryN(2, function (f, maybe) { return Maybe.fromMaybe(x, maybe.map(f)); }); }
+  if (arguments.length === 2) { return function (maybe) { return Maybe.fromMaybe(x, maybe.map(f)); }; }
+  return Maybe.fromMaybe(x, maybe.map(f));
 };
 
-Maybe$1.maybeToEither = function(x, maybe){
+Maybe.maybeToEither = function(x, maybe){
   if (arguments.length === 1) { return function (maybe) { return maybe.isNothing ? Left$1(x) : Right$1(maybe.value); }; }
   return maybe.isNothing ? Left$1(x) : Right$1(maybe.value);
 };
 //encase justs
 //v8 optimization
-toFastProperties(Maybe$1);
-toFastProperties(Maybe$1.prototype);
+toFastProperties(Maybe);
+toFastProperties(Maybe.prototype);
 
-var Just = Maybe$1.Just;
-var Nothing = Maybe$1.Nothing;
+var Just = Maybe.Just;
+var Nothing = Maybe.Nothing;
 
 var either_type = 'brisk-control/Either';
 
@@ -2985,7 +2989,7 @@ var index = {
   Either: Either,
   Action: Action,
   IO: IO,
-  Maybe: Maybe$1,
+  Maybe: Maybe,
   Reader: Reader,
   Future:Action
 };
