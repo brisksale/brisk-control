@@ -12,7 +12,7 @@ Reader.run = function(reader) {
   return reader.run.apply(reader, [].slice.call(arguments, 1));
 };
 
-Reader.prototype['@@type'] = 'ramda-fantasy/Reader';
+Reader.prototype['@@type'] = 'brisk-control/Reader';
 
 Reader.prototype.chain = function(f) {
   var reader = this;
