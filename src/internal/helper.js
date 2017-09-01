@@ -2,13 +2,6 @@
 
 'use strict';
 
-/**
- * 
- * this file was based of of ramdas toString function
- * I choose to do this to remove all dependencies from this library 
- * so it may look like this file is over doing it a bit. But thats ok.
- */
-
 const arity = function arity(n, fn) {
   switch (n) {
     case 0:
