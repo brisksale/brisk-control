@@ -1,4 +1,4 @@
-# algebraicTypes
-algebraicTypes according to fantasy land specs. Provides composible types that are easy to use
+# Brisk-Control
+Fantasy Land compatible types for easy integration with functional  javascript libraries like [Ramda.js](https://github.com/ramda/ramda) This library benefits from having  no dependencies
 
-> `npm i brisksale-algebraic-types --save`
+> `npm i brisk-control --save`

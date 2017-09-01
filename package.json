@@ -1,23 +1,59 @@
 {
-  "name": "brisk-control",
-  "description": "Fantasy Land compatible types for easy integration with functional  libraries like ramda",
-  "version": "0.0.1",
-  "module": "src/index.js",
+  "name": "@dakotamurphyucf/brisk-control",
+  "version": "1.0.0",
+  "description": "Fantasy Land compatible types for easy integration with functional  javascript libraries like ramda. This library benifits by having  no dependencies",
   "main": "index.js",
-  "license": "MIT" ,
+  "directories": {
+    "doc": "docs"
+  },
   "files": [
     "index.js",
     "src",
     "dist",
     "index.d.ts"
   ],
+  "scripts": {
+    "build": "rollup -c"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/brisksale/fantasyAlgebraicTypes.git"
+    "url": "git+https://github.com/brisksale/brisk-control.git"
   },
-  "author":"Dakota Murphy <dakota@brisksale.com>",
-  "dependencies": {
+  "author": "Dakota Murphy <dakota@brisksale.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brisksale/brisk-control/issues"
   },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "keywords": [
+    "algebraic",
+    "async",
+    "asynchronous",
+    "browser",
+    "control-flow",
+    "fantasy-land",
+    "fp",
+    "functional",
+    "functor",
+    "future",
+    "Action",
+    "action",
+    "library",
+    "monad",
+    "monadic",
+    "node",
+    "parallel",
+    "promise",
+    "sequential",
+    "Reader Monad",
+    "IO",
+    "Ramda",
+    "reader",
+    "maybe",
+    "either"
+  ],
   "devDependencies": {
     "rollup": "^0.43.0",
     "rollup-plugin-buble": "^0.15.0",
@@ -26,7 +62,5 @@
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.0.0"
   },
-  "scripts": {
-    "build": "rollup -c"
-  }
+  "homepage": "https://github.com/brisksale/brisk-control#readme"
 }
