@@ -1,7 +1,6 @@
 
 
 'use strict';
-
 const arity = function arity(n, fn) {
   switch (n) {
     case 0:
@@ -612,10 +611,10 @@ export function concat(a, b) {
     }
     throw new TypeError(toString(b) + ' is not a string');
   }
-  if (a != null && _isFunction(a['fantasy-land/concat'])) {
+  if (a != null && isFunction(a['fantasy-land/concat'])) {
     return a['fantasy-land/concat'](b);
   }
-  if (a != null && _isFunction(a.concat)) {
+  if (a != null && isFunction(a.concat)) {
     return a.concat(b);
   }
   throw new TypeError(toString(a) + ' does not have a method named "concat" or "fantasy-land/concat"');
