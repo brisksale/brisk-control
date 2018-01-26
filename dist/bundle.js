@@ -24,13 +24,6 @@ function toFastProperties(o) {
 	return FastObject(o);
 }
 
-/**
- * 
- * this file was based of of ramdas toString function
- * I choose to do this to remove all dependencies from this library 
- * so it may look like this file is over doing it a bit. But thats ok.
- */
-
 var arity = function arity(n, fn) {
   switch (n) {
     case 0:
@@ -641,10 +634,10 @@ function concat(a, b) {
     }
     throw new TypeError(toString(b) + ' is not a string');
   }
-  if (a != null && _isFunction(a['fantasy-land/concat'])) {
+  if (a != null && isFunction(a['fantasy-land/concat'])) {
     return a['fantasy-land/concat'](b);
   }
-  if (a != null && _isFunction(a.concat)) {
+  if (a != null && isFunction(a.concat)) {
     return a.concat(b);
   }
   throw new TypeError(toString(a) + ' does not have a method named "concat" or "fantasy-land/concat"');
@@ -2060,32 +2053,32 @@ function ChainRec(iterate, init) {
 ChainRec.prototype = Object.create(Action.prototype);
 
 ChainRec.prototype._exec = function(rej, res) {
-  var inst = this;
-  var cancel = emptyFn, i = 0;
-  (function recur(state) {
-    var timing = Undetermined;
-    function chainRecRes(it) {
-      i = i + 1;
-      if (timing & Undetermined) {
-        timing = Synchronous;
-        state = it; //eslint-disable-line
-      } else {
-        recur(it);
-      }
-    }
-    while (!state.done) {
-      timing = Undetermined;
-      var m = inst._iterate(nextValue, iterationDone, state.value);
-      cancel = m._exec(rej, chainRecRes);
-      if (~(timing & Synchronous)) {
-        timing = Asynchronous;
-        return;
-      }
-    }
-    res(state.value);
-  }(nextValue(inst._init)));
-  return function() { cancel(); };
-};
+     var inst = this;
+     var cancel = emptyFn, i = 0;
+     (function recur(state) {
+       var timing = Undetermined;
+       function chainRecRes(it) {
+         i = i + 1;
+         if (timing === Undetermined) {
+           timing = Synchronous;
+           state = it; //eslint-disable-line
+         } else {
+           recur(it);
+         }
+       }
+       while (!state.done) {
+         timing = Undetermined;
+         var m = inst._iterate(nextValue, iterationDone, state.value);
+         cancel = m._exec(rej, chainRecRes);
+         if (!(timing === Synchronous)) {
+           timing = Asynchronous;
+           return;
+         }
+       }
+       res(state.value);
+     }(nextValue(inst._init)));
+     return function() { cancel(); };
+   };
 
 (ChainRec.prototype).toString = function ChainRec$toString(){
   return ("Action.chainRec(" + (showFunction(this._iterate)) + ", " + (toString(this._init)) + ")");

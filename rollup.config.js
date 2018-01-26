@@ -21,28 +21,28 @@ import buble from 'rollup-plugin-buble';
 
 const pkg = require('./package.json');
 
-// const dependencies = {
-//   'ramda': 'ramda'
-// };
-
-// export default {
-//   entry: 'src/index.js',
-//   plugins: [buble()],
-//   format: 'umd',
-//   moduleName: 'brisk-control',
-//   dest: 'dist/bundle.js'
-// };
+const dependencies = {
+  'ramda': 'ramda'
+};
 
 export default {
   entry: 'src/index.js',
-  plugins: [resolve({
-    customResolveOptions: {
-      moduleDirectory: 'node_modules'
-    }
-  }), commonjs()],
-  // external: Object.keys(dependencies),
-  // globals: dependencies,
-  format: 'cjs',
+  plugins: [buble()],
+  format: 'umd',
   moduleName: 'brisk-control',
-  dest: 'index.js'
+  dest: 'dist/bundle.js'
 };
+
+// export default {
+//   entry: 'src/index.js',
+//   plugins: [resolve({
+//     customResolveOptions: {
+//       moduleDirectory: 'node_modules'
+//     }
+//   }), commonjs()],
+//   // external: Object.keys(dependencies),
+//   // globals: dependencies,
+//   format: 'cjs',
+//   moduleName: 'brisk-control',
+//   dest: 'index.js'
+// };
